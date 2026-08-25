@@ -1,22 +1,49 @@
 import React, { useState } from 'react';
 import { FAMOUS_GR_LIST } from '../data/grData';
+import { ALL_GR_CATALOG } from '../data/allGrCatalog';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Compass, MapPin, Navigation, ArrowRight, Mountain, Calendar, Layers, CheckCircle2, ChevronRight, PlusCircle } from 'lucide-react';
+import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search } from 'lucide-react';
 
 export default function GrCatalog({ onSelectGrForPlanner }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeCatalogTab, setActiveCatalogTab] = useState('famous'); // 'famous' | 'all'
   const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
   const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
 
-  const filteredGrs = FAMOUS_GR_LIST.filter(gr => 
+  // Fusionner les listes ou filtrer selon l'onglet actif
+  const currentCatalogList = activeCatalogTab === 'famous' ? FAMOUS_GR_LIST : ALL_GR_CATALOG;
+
+  const filteredGrs = currentCatalogList.filter(gr => 
     gr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     gr.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
     gr.shortName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleSelectGr = (gr) => {
+    setSelectedGr(gr);
+    // Basculer sur 'stages' ou 'details' selon la présence d'étapes
+    if (gr.stages && gr.stages.length > 0) {
+      setActiveViewMode('stages');
+    } else {
+      setActiveViewMode('details');
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveCatalogTab(tab);
+    const list = tab === 'famous' ? FAMOUS_GR_LIST : ALL_GR_CATALOG;
+    setSelectedGr(list[0]);
+    if (list[0].stages) {
+      setActiveViewMode('stages');
+    } else {
+      setActiveViewMode('details');
+    }
+  };
+
   // Générer un profil d'altitude fictif réaliste pour l'aperçu si aucun GPX brut n'est chargé
   const generateMockProfileFromWaypoints = (waypoints, totalDist) => {
+    if (!waypoints || waypoints.length === 0) return [];
     const points = [];
     const step = totalDist / Math.max(waypoints.length - 1, 1);
     waypoints.forEach((wpt, i) => {
@@ -28,6 +55,9 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
     return points;
   };
 
+  const hasWaypoints = selectedGr && selectedGr.waypoints && selectedGr.waypoints.length > 0;
+  const hasStages = selectedGr && selectedGr.stages && selectedGr.stages.length > 0;
+
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
@@ -38,32 +68,72 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
             <Compass size={28} color="#3b82f6" />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>Catalogue des Grands GR & Sentiers</h2>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>Catalogue des Sentiers de Grande Randonnée (GR)</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Explorez les Sentiers de Grande Randonnée emblématiques et préparez vos grandes traversées.
+              Explorez les sentiers de grande randonnée officiels de France et préparez vos grandes traversées.
             </p>
           </div>
         </div>
 
-        {/* Barre de recherche & filtres */}
-        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            placeholder="Rechercher un GR, une région (ex: GR20, Pyrénées, Alpes, Corse)..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: '280px',
-              padding: '0.75rem 1.25rem',
-              borderRadius: '10px',
-              border: '1px solid var(--border-color)',
-              background: 'rgba(15, 23, 42, 0.8)',
-              color: '#fff',
-              fontSize: '0.95rem',
-              outline: 'none'
-            }}
-          />
+        {/* Onglets + Recherche */}
+        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+          
+          {/* Onglets Filtre Catalogue */}
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.35rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => handleTabChange('famous')}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeCatalogTab === 'famous' ? 'var(--primary-orange)' : 'transparent',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Itinéraires Majeurs ({FAMOUS_GR_LIST.length})
+            </button>
+            <button
+              onClick={() => handleTabChange('all')}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeCatalogTab === 'all' ? 'var(--primary-orange)' : 'transparent',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Tous les GR de France ({ALL_GR_CATALOG.length + FAMOUS_GR_LIST.length})
+            </button>
+          </div>
+
+          {/* Recherche */}
+          <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }} />
+            <input
+              type="text"
+              placeholder="Rechercher par numéro, nom, région..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem 0.75rem 2.5rem',
+                borderRadius: '10px',
+                border: '1px solid var(--border-color)',
+                background: 'rgba(15, 23, 42, 0.8)',
+                color: '#fff',
+                fontSize: '0.95rem',
+                outline: 'none'
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -71,49 +141,61 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1fr) 2fr', gap: '1.5rem' }}>
         
         {/* Left Column: GR Cards Selector */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {filteredGrs.map((gr) => {
-            const isSelected = selectedGr?.id === gr.id;
-            return (
-              <div
-                key={gr.id}
-                onClick={() => setSelectedGr(gr)}
-                className="glass-card"
-                style={{
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  borderLeft: isSelected ? `5px solid ${gr.color}` : '1px solid var(--border-color)',
-                  background: isSelected ? 'rgba(31, 41, 55, 0.95)' : 'rgba(31, 41, 55, 0.5)',
-                  boxShadow: isSelected ? `0 0 15px ${gr.color}33` : 'none',
-                  transform: isSelected ? 'scale(1.01)' : 'scale(1)'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <span className="badge" style={{ backgroundColor: `${gr.color}22`, color: gr.color, border: `1px solid ${gr.color}44` }}>
-                    {gr.shortName}
-                  </span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <MapPin size={12} /> {gr.region}
-                  </span>
-                </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '700px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+          {filteredGrs.length > 0 ? (
+            filteredGrs.map((gr) => {
+              const isSelected = selectedGr?.id === gr.id;
+              return (
+                <div
+                  key={gr.id}
+                  onClick={() => handleSelectGr(gr)}
+                  className="glass-card"
+                  style={{
+                    padding: '1.1rem 1.25rem',
+                    cursor: 'pointer',
+                    borderLeft: isSelected ? `5px solid ${gr.color}` : '1px solid var(--border-color)',
+                    background: isSelected ? 'rgba(31, 41, 55, 0.95)' : 'rgba(31, 41, 55, 0.5)',
+                    boxShadow: isSelected ? `0 0 15px ${gr.color}33` : 'none',
+                    transform: isSelected ? 'scale(1.01)' : 'scale(1)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                    <span className="badge" style={{ backgroundColor: `${gr.color}22`, color: gr.color, border: `1px solid ${gr.color}44` }}>
+                      {gr.shortName}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <MapPin size={11} /> {gr.region}
+                    </span>
+                  </div>
 
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: '0.5rem' }}>
-                  {gr.name}
-                </h3>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', marginBottom: '0.4rem' }}>
+                    {gr.name}
+                  </h3>
 
-                <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <div><strong style={{ color: '#fff' }}>{gr.distanceKm}</strong> km</div>
-                  <div><strong style={{ color: 'var(--primary-orange)' }}>+{gr.elevationGainM}m</strong> D+</div>
-                  <div><strong style={{ color: '#fff' }}>{gr.recommendedDays}</strong> jours</div>
+                  {gr.distanceKm ? (
+                    <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <div><strong style={{ color: '#fff' }}>{gr.distanceKm}</strong> km</div>
+                      <div><strong style={{ color: 'var(--primary-orange)' }}>+{gr.elevationGainM}m</strong> D+</div>
+                      <div><strong style={{ color: '#fff' }}>{gr.recommendedDays}</strong> j</div>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {gr.description}
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+              Aucun sentier trouvé.
+            </div>
+          )}
         </div>
 
         {/* Right Column: Selected GR Full Detail Panel */}
-        {selectedGr && (
-          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {selectedGr ? (
+          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignSelf: 'flex-start' }}>
             
             {/* Title & Action */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
@@ -127,129 +209,154 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff' }}>{selectedGr.name}</h2>
               </div>
 
-              <button
-                onClick={() => onSelectGrForPlanner(selectedGr)}
-                className="btn btn-primary"
-              >
-                <PlusCircle size={18} />
-                <span>Ajouter au Planificateur Multi-GR</span>
-              </button>
+              {/* Action planner compatible uniquement si waypoints pour le moment */}
+              {hasWaypoints && (
+                <button
+                  onClick={() => onSelectGrForPlanner(selectedGr)}
+                  className="btn btn-primary"
+                >
+                  <PlusCircle size={18} />
+                  <span>Ajouter au Planificateur Multi-GR</span>
+                </button>
+              )}
             </div>
 
-            {/* Quick Metrics Banner */}
-            <div className="stats-grid" style={{ marginBottom: 0 }}>
-              <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
-                <div className="stat-icon" style={{ background: 'rgba(249, 115, 22, 0.15)', color: 'var(--primary-orange)' }}>
-                  <Navigation size={24} />
+            {/* Quick Metrics Banner (uniquement si valeurs renseignées) */}
+            {selectedGr.distanceKm && (
+              <div className="stats-grid" style={{ marginBottom: 0 }}>
+                <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem' }}>
+                  <div className="stat-icon" style={{ background: 'rgba(249, 115, 22, 0.15)', color: 'var(--primary-orange)' }}>
+                    <Navigation size={20} />
+                  </div>
+                  <div>
+                    <div className="stat-value" style={{ fontSize: '1.25rem' }}>{selectedGr.distanceKm} km</div>
+                    <div className="stat-label">Distance</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="stat-value">{selectedGr.distanceKm} km</div>
-                  <div className="stat-label">Distance totale</div>
-                </div>
-              </div>
 
-              <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
-                <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--emerald-green)' }}>
-                  <Mountain size={24} />
+                <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem' }}>
+                  <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--emerald-green)' }}>
+                    <Mountain size={20} />
+                  </div>
+                  <div>
+                    <div className="stat-value" style={{ fontSize: '1.25rem' }}>+{selectedGr.elevationGainM} m</div>
+                    <div className="stat-label">D+ Cumulé</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="stat-value">+{selectedGr.elevationGainM} m</div>
-                  <div className="stat-label">Dénivelé positif (D+)</div>
-                </div>
-              </div>
 
-              <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
-                <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
-                  <Calendar size={24} />
-                </div>
-                <div>
-                  <div className="stat-value">{selectedGr.recommendedDays} Jours</div>
-                  <div className="stat-label">Durée recommandée</div>
+                <div className="glass-card stat-card" style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem' }}>
+                  <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
+                    <Calendar size={20} />
+                  </div>
+                  <div>
+                    <div className="stat-value" style={{ fontSize: '1.25rem' }}>{selectedGr.recommendedDays} Jours</div>
+                    <div className="stat-label">Durée</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Description */}
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-              {selectedGr.description}
-            </p>
-
-            {/* Tabs for Stages vs Map vs Elevation Profile */}
-            <div style={{ display: 'flex', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-              <button
-                onClick={() => setActiveViewMode('stages')}
-                className={`btn btn-sm ${activeViewMode === 'stages' ? 'btn-primary' : 'btn-secondary'}`}
-              >
-                <Layers size={16} /> Étapes ({selectedGr.stages.length})
-              </button>
-              <button
-                onClick={() => setActiveViewMode('map')}
-                className={`btn btn-sm ${activeViewMode === 'map' ? 'btn-primary' : 'btn-secondary'}`}
-              >
-                <MapPin size={16} /> Carte interactive
-              </button>
-              <button
-                onClick={() => setActiveViewMode('profile')}
-                className={`btn btn-sm ${activeViewMode === 'profile' ? 'btn-primary' : 'btn-secondary'}`}
-              >
-                <Mountain size={16} /> Profil d'altitude
-              </button>
+            <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.95rem' }}>Description / Tracé</h4>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>
+                {selectedGr.description}
+              </p>
             </div>
 
-            {/* Tab View Content */}
-            {activeViewMode === 'stages' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                {selectedGr.stages.map((stage) => (
-                  <div 
-                    key={stage.number}
-                    style={{
-                      padding: '1rem 1.25rem',
-                      borderRadius: '10px',
-                      background: 'rgba(15, 23, 42, 0.7)',
-                      border: '1px solid var(--border-color)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '0.75rem'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${selectedGr.color}22`, color: selectedGr.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
-                        {stage.number}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem' }}>{stage.name}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Temps estimé : {stage.timeEst}</div>
-                      </div>
-                    </div>
+            {/* Onglets uniquement si étapes ou carte */}
+            {(hasStages || hasWaypoints) ? (
+              <>
+                <div style={{ display: 'flex', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+                  {hasStages && (
+                    <button
+                      onClick={() => setActiveViewMode('stages')}
+                      className={`btn btn-sm ${activeViewMode === 'stages' ? 'btn-primary' : 'btn-secondary'}`}
+                    >
+                      <Layers size={16} /> Étapes ({selectedGr.stages.length})
+                    </button>
+                  )}
+                  {hasWaypoints && (
+                    <button
+                      onClick={() => setActiveViewMode('map')}
+                      className={`btn btn-sm ${activeViewMode === 'map' ? 'btn-primary' : 'btn-secondary'}`}
+                    >
+                      <MapPin size={16} /> Carte interactive
+                    </button>
+                  )}
+                  {hasWaypoints && (
+                    <button
+                      onClick={() => setActiveViewMode('profile')}
+                      className={`btn btn-sm ${activeViewMode === 'profile' ? 'btn-primary' : 'btn-secondary'}`}
+                    >
+                      <Mountain size={16} /> Profil d'altitude
+                    </button>
+                  )}
+                </div>
 
-                    <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
-                      <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
-                      <div><strong style={{ color: 'var(--red-accent)' }}>-{stage.dMinus}m</strong></div>
-                    </div>
+                {/* Tab View Content */}
+                {activeViewMode === 'stages' && hasStages && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                    {selectedGr.stages.map((stage) => (
+                      <div 
+                        key={stage.number}
+                        style={{
+                          padding: '0.85rem 1.1rem',
+                          borderRadius: '10px',
+                          background: 'rgba(15, 23, 42, 0.7)',
+                          border: '1px solid var(--border-color)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '0.75rem'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${selectedGr.color}22`, color: selectedGr.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem' }}>
+                            {stage.number}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Est: {stage.timeEst}</div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
+                          <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                {activeViewMode === 'map' && hasWaypoints && (
+                  <GpxMap 
+                    waypoints={selectedGr.waypoints} 
+                    height="350px" 
+                    color={selectedGr.color} 
+                  />
+                )}
+
+                {activeViewMode === 'profile' && hasWaypoints && (
+                  <ElevationProfile 
+                    profileData={generateMockProfileFromWaypoints(selectedGr.waypoints, selectedGr.distanceKm)}
+                    color={selectedGr.color}
+                    height="280px"
+                  />
+                )}
+              </>
+            ) : (
+              <div style={{ padding: '1.5rem', background: 'rgba(15, 23, 42, 0.3)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                💡 Utilisez le bouton d'import GPX dans <strong>Mes Trails & GPX</strong> pour charger le tracé exact de ce GR et générer son profil altimétrique dynamique.
               </div>
             )}
 
-            {activeViewMode === 'map' && (
-              <GpxMap 
-                waypoints={selectedGr.waypoints} 
-                height="400px" 
-                color={selectedGr.color} 
-              />
-            )}
-
-            {activeViewMode === 'profile' && (
-              <ElevationProfile 
-                profileData={generateMockProfileFromWaypoints(selectedGr.waypoints, selectedGr.distanceKm)}
-                color={selectedGr.color}
-                height="320px"
-              />
-            )}
-
+          </div>
+        ) : (
+          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            Sélectionnez un sentier de grande randonnée dans la liste pour voir les détails.
           </div>
         )}
 

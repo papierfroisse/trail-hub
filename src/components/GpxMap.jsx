@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Icones personnalisées Leaflet
+// Icones personnalisées Leaflet pour le tracé
 const createCustomIcon = (color, label) => {
   return L.divIcon({
     className: 'custom-map-marker',
@@ -31,6 +31,33 @@ const createCustomIcon = (color, label) => {
   });
 };
 
+// Icones pour les Points d'Intérêt (POIs) - Toilettes, Eau, Réparation
+const createPoiIcon = (emoji, color) => {
+  return L.divIcon({
+    className: 'custom-poi-marker',
+    html: `
+      <div style="
+        background-color: ${color};
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 1.5px solid #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        line-height: 1;
+      ">
+        ${emoji}
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12]
+  });
+};
+
 const hoverIcon = L.divIcon({
   className: 'custom-hover-marker',
   html: `
@@ -52,6 +79,11 @@ const startIcon = createCustomIcon('#10b981', 'D'); // Depart
 const endIcon = createCustomIcon('#ef4444', 'A');   // Arrivee
 const waypointIcon = createCustomIcon('#3b82f6', '•'); // Waypoint
 
+// Icons POIs
+const toiletIcon = createPoiIcon('🚾', '#3b82f6');  // Toilettes (bleu)
+const waterIcon = createPoiIcon('🚰', '#06b6d4');   // Eau potable (cyan)
+const repairIcon = createPoiIcon('🔧', '#f59e0b');  // Réparation (orange)
+
 function MapBoundsFitter({ points }) {
   const map = useMap();
 
@@ -65,7 +97,7 @@ function MapBoundsFitter({ points }) {
   return null;
 }
 
-export default function GpxMap({ waypoints = [], trackPoints = [], height = "420px", color = "#f97316", hoverPoint = null }) {
+export default function GpxMap({ waypoints = [], trackPoints = [], pois = [], height = "420px", color = "#f97316", hoverPoint = null }) {
   const center = waypoints.length > 0 
     ? [waypoints[0].lat, waypoints[0].lng] 
     : (trackPoints.length > 0 ? [trackPoints[0].lat, trackPoints[0].lng] : [45.0, 6.0]);
@@ -73,6 +105,25 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
   const polylinePositions = trackPoints.length > 0 
     ? trackPoints.map(pt => [pt.lat, pt.lng])
     : waypoints.map(wpt => [wpt.lat, wpt.lng]);
+
+  // Associer le type de POI à son icône
+  const getPoiIcon = (type) => {
+    switch (type) {
+      case 'toilet': return toiletIcon;
+      case 'water': return waterIcon;
+      case 'repair': return repairIcon;
+      default: return waypointIcon;
+    }
+  };
+
+  const getPoiTypeName = (type) => {
+    switch (type) {
+      case 'toilet': return 'WC Public';
+      case 'water': return 'Eau Potable';
+      case 'repair': return 'Atelier Réparation';
+      default: return 'Point d\'intérêt';
+    }
+  };
 
   return (
     <div style={{ height, width: '100%', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative' }}>
@@ -103,6 +154,19 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
             </Popup>
           </Marker>
         )}
+
+        {/* Marqueurs des Points d'Intérêt (POIs) */}
+        {pois && pois.map((poi, idx) => (
+          <Marker key={`poi-${idx}`} position={[poi.lat, poi.lng]} icon={getPoiIcon(poi.type)}>
+            <Popup>
+              <div style={{ fontSize: '0.9rem' }}>
+                <strong style={{ color: 'var(--primary-orange)' }}>{getPoiTypeName(poi.type)}</strong>
+                <div style={{ fontWeight: 700, marginTop: '0.2rem', color: '#1f2937' }}>{poi.name}</div>
+                {poi.notes && <div style={{ fontSize: '0.75rem', color: '#4b5563', marginTop: '0.35rem', fontStyle: 'italic', borderTop: '1px solid #e5e7eb', paddingTop: '0.25rem' }}>{poi.notes}</div>}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
 
         {/* Marqueur de départ */}
         {waypoints.length > 0 && (

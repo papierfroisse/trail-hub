@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { parseGPX } from '../utils/gpxParser';
-import { MapPin, Plus, Upload, Trash2, Calendar, Mountain, Navigation, CheckCircle2, Clock, FileText, ChevronRight } from 'lucide-react';
+import TrailCalendar from './TrailCalendar';
+import { MapPin, Plus, Upload, Trash2, Calendar, Mountain, Navigation, CheckCircle2, Clock, FileText, ChevronRight, Grid, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function TrailList({ trails, onSaveTrail, onDeleteTrail, onSelectTrail }) {
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL' | 'À venir' | 'Terminé' | 'Wishlist'
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'calendar'
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeModalTab, setActiveModalTab] = useState('gpx'); // 'gpx' | 'manual'
 
@@ -88,114 +90,167 @@ export default function TrailList({ trails, onSaveTrail, onDeleteTrail, onSelect
           </p>
         </div>
 
-        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary">
-          <Plus size={18} />
-          <span>Ajouter un Trail / GPX</span>
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {/* Boutons de changement de vue */}
+          <div style={{ display: 'flex', gap: '0.25rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.35rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => setViewMode('list')}
+              style={{
+                padding: '0.4rem 0.8rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: viewMode === 'list' ? 'var(--primary-orange)' : 'transparent',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.85rem'
+              }}
+              title="Vue Liste"
+            >
+              <Grid size={15} />
+              <span>Liste</span>
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              style={{
+                padding: '0.4rem 0.8rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: viewMode === 'calendar' ? 'var(--primary-orange)' : 'transparent',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.85rem'
+              }}
+              title="Vue Calendrier"
+            >
+              <CalendarIcon size={15} />
+              <span>Calendrier</span>
+            </button>
+          </div>
+
+          <button onClick={() => setIsModalOpen(true)} className="btn btn-primary">
+            <Plus size={18} />
+            <span>Ajouter un Trail / GPX</span>
+          </button>
+        </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-        {[
-          { id: 'ALL', label: `Tous (${trails.length})` },
-          { id: 'À venir', label: `À venir (${trails.filter(t => t.status === 'À venir').length})` },
-          { id: 'Terminé', label: `Terminés (${trails.filter(t => t.status === 'Terminé').length})` },
-          { id: 'Wishlist', label: `Wishlist (${trails.filter(t => t.status === 'Wishlist').length})` }
-        ].map((btn) => (
-          <button
-            key={btn.id}
-            onClick={() => setFilterStatus(btn.id)}
-            className={`btn btn-sm ${filterStatus === btn.id ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            {btn.label}
-          </button>
-        ))}
-      </div>
+      {/* Reste du code géré en dessous */}
+      {viewMode === 'calendar' ? (
+        <TrailCalendar trails={trails} onSelectTrail={onSelectTrail} />
+      ) : (
+        <>
+          {/* Filter Tabs */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {[
+              { id: 'ALL', label: `Tous (${trails.length})` },
+              { id: 'À venir', label: `À venir (${trails.filter(t => t.status === 'À venir').length})` },
+              { id: 'Terminé', label: `Terminés (${trails.filter(t => t.status === 'Terminé').length})` },
+              { id: 'Wishlist', label: `Wishlist (${trails.filter(t => t.status === 'Wishlist').length})` }
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setFilterStatus(btn.id)}
+                className={`btn btn-sm ${filterStatus === btn.id ? 'btn-primary' : 'btn-secondary'}`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Grid of Trails */}
-      {filteredTrails.length === 0 ? (
-        <div className="glass-card" style={{ padding: '3.5rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-          <Upload size={42} color="var(--primary-orange)" style={{ margin: '0 auto 1rem auto', display: 'block', opacity: 0.8 }} />
-          <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>Aucun trail trouvé</h3>
-          <p style={{ fontSize: '0.95rem', maxWidth: '480px', margin: '0 auto 1.5rem auto' }}>
-            Vous n'avez pas encore ajouté d'itinéraire dans cette catégorie. Cliquez ci-dessous pour importer un fichier .GPX ou saisir un trail.
-          </p>
-          <button onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">
-            <Plus size={16} /> Ajouter un trail
-          </button>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-          {filteredTrails.map((trail) => {
-            const isCompleted = trail.status === 'Terminé';
-            const isWishlist = trail.status === 'Wishlist';
-            return (
-              <div
-                key={trail.id}
-                className="glass-card"
-                style={{
-                  padding: '1.5rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justify: 'space-between',
-                  gap: '1.25rem',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                    <span className={`badge ${isCompleted ? 'badge-emerald' : isWishlist ? 'badge-purple' : 'badge-orange'}`}>
-                      {trail.status}
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                      <Calendar size={13} /> {trail.date || 'Non daté'}
-                    </span>
+      {viewMode === 'list' && (
+        filteredTrails.length === 0 ? (
+          <div className="glass-card" style={{ padding: '3.5rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <Upload size={42} color="var(--primary-orange)" style={{ margin: '0 auto 1rem auto', display: 'block', opacity: 0.8 }} />
+            <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>Aucun trail trouvé</h3>
+            <p style={{ fontSize: '0.95rem', maxWidth: '480px', margin: '0 auto 1.5rem auto' }}>
+              Vous n'avez pas encore ajouté d'itinéraire dans cette catégorie. Cliquez ci-dessous pour importer un fichier .GPX ou saisir un trail.
+            </p>
+            <button onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">
+              <Plus size={16} /> Ajouter un trail
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {filteredTrails.map((trail) => {
+              const isCompleted = trail.status === 'Terminé';
+              const isWishlist = trail.status === 'Wishlist';
+              return (
+                <div
+                  key={trail.id}
+                  className="glass-card"
+                  style={{
+                    padding: '1.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justify: 'space-between',
+                    gap: '1.25rem',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                      <span className={`badge ${isCompleted ? 'badge-emerald' : isWishlist ? 'badge-purple' : 'badge-orange'}`}>
+                        {trail.status}
+                      </span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Calendar size={13} /> {trail.date || 'Non daté'}
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginBottom: '0.75rem', lineHeight: 1.3 }}>
+                      {trail.name}
+                    </h3>
+
+                    {trail.notes && (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineClamp: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {trail.notes}
+                      </p>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '1.25rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.85rem', borderRadius: '10px', fontSize: '0.9rem' }}>
+                      <div>
+                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Distance</span>
+                        <strong style={{ color: '#fff', fontSize: '1.1rem' }}>{trail.distanceKm}</strong> km
+                      </div>
+                      <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '1.25rem' }}>
+                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Dénivelé D+</span>
+                        <strong style={{ color: 'var(--emerald-green)', fontSize: '1.1rem' }}>+{trail.dPlus}</strong> m
+                      </div>
+                    </div>
                   </div>
 
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginBottom: '0.75rem', lineHeight: 1.3 }}>
-                    {trail.name}
-                  </h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
+                    <button
+                      onClick={() => onDeleteTrail(trail.id)}
+                      className="btn btn-secondary btn-sm"
+                      style={{ color: 'var(--red-accent)', background: 'transparent', border: 'none' }}
+                    >
+                      <Trash2 size={16} /> Supprimer
+                    </button>
 
-                  {trail.notes && (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineClamp: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {trail.notes}
-                    </p>
-                  )}
-
-                  <div style={{ display: 'flex', gap: '1.25rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.85rem', borderRadius: '10px', fontSize: '0.9rem' }}>
-                    <div>
-                      <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Distance</span>
-                      <strong style={{ color: '#fff', fontSize: '1.1rem' }}>{trail.distanceKm}</strong> km
-                    </div>
-                    <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '1.25rem' }}>
-                      <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Dénivelé D+</span>
-                      <strong style={{ color: 'var(--emerald-green)', fontSize: '1.1rem' }}>+{trail.dPlus}</strong> m
-                    </div>
+                    <button
+                      onClick={() => onSelectTrail(trail)}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <span>Détails & GPX</span>
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
-                  <button
-                    onClick={() => onDeleteTrail(trail.id)}
-                    className="btn btn-secondary btn-sm"
-                    style={{ color: 'var(--red-accent)', background: 'transparent', border: 'none' }}
-                  >
-                    <Trash2 size={16} /> Supprimer
-                  </button>
-
-                  <button
-                    onClick={() => onSelectTrail(trail)}
-                    className="btn btn-primary btn-sm"
-                  >
-                    <span>Détails & GPX</span>
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )
       )}
 
       {/* Modal d'ajout de trail / GPX */}
