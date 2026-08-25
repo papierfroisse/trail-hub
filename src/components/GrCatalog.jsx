@@ -11,8 +11,18 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
   const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
 
+  // Fonction pour extraire le numéro du GR afin de trier numériquement
+  const getGrNumber = (gr) => {
+    if (gr.num) return parseInt(gr.num, 10);
+    const match = gr.shortName.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 9999;
+  };
+
+  // Liste complète triée (Majeurs + Secondaires)
+  const sortedAllGrList = [...FAMOUS_GR_LIST, ...ALL_GR_CATALOG].sort((a, b) => getGrNumber(a) - getGrNumber(b));
+
   // Fusionner les listes ou filtrer selon l'onglet actif
-  const currentCatalogList = activeCatalogTab === 'famous' ? FAMOUS_GR_LIST : ALL_GR_CATALOG;
+  const currentCatalogList = activeCatalogTab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
 
   const filteredGrs = currentCatalogList.filter(gr => 
     gr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,7 +42,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
 
   const handleTabChange = (tab) => {
     setActiveCatalogTab(tab);
-    const list = tab === 'famous' ? FAMOUS_GR_LIST : ALL_GR_CATALOG;
+    const list = tab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
     setSelectedGr(list[0]);
     if (list[0].stages) {
       setActiveViewMode('stages');
