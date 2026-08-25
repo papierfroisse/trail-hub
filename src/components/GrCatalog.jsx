@@ -4,7 +4,7 @@ import { ALL_GR_CATALOG } from '../data/allGrCatalog';
 import { CITIES_COORDINATES } from '../data/citiesCoordinates';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search } from 'lucide-react';
+import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 
 export default function GrCatalog({ onSelectGrForPlanner }) {
@@ -27,6 +27,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
   const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
   const [loadingDb, setLoadingDb] = useState(false);
+  const [hikerProfile, setHikerProfile] = useState('active'); // 'relaxed' | 'active' | 'runner' | 'ultra'
 
   // Charger les GR réels depuis Supabase si configuré
   useEffect(() => {
@@ -277,6 +278,70 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   const hasWaypoints = selectedGr && selectedGr.waypoints && selectedGr.waypoints.length > 0;
   const hasStages = selectedGr && selectedGr.stages && selectedGr.stages.length > 0;
 
+  const getEstimatedTime = (dist, dPlus, profile) => {
+    let baseSpeed = 4.5;
+    let dPlusPenalty = 10;
+    
+    if (profile === 'relaxed') {
+      baseSpeed = 3.5;
+      dPlusPenalty = 12;
+    } else if (profile === 'active') {
+      baseSpeed = 4.5;
+      dPlusPenalty = 10;
+    } else if (profile === 'runner') {
+      baseSpeed = 8.0;
+      dPlusPenalty = 6;
+    } else if (profile === 'ultra') {
+      baseSpeed = 10.0;
+      dPlusPenalty = 5;
+    }
+    
+    const rawHours = dist / baseSpeed;
+    const penaltyHours = (dPlus / 100) * (dPlusPenalty / 60);
+    const totalHours = rawHours + penaltyHours;
+    
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours % 1) * 60);
+    return `${hours}h${minutes < 10 ? '0' : ''}${minutes}`;
+  };
+
+  const downloadGpx = (gr) => {
+    if (!gr || !gr.waypoints || gr.waypoints.length === 0) return;
+    
+    let gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="TrailHub" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>${gr.name}</name>
+    <desc>${gr.description || ''}</desc>
+  </metadata>
+  <trk>
+    <name>${gr.shortName}</name>
+    <trkseg>`;
+
+    gr.waypoints.forEach(pt => {
+      gpxContent += `
+      <trkpt lat="${pt.lat}" lon="${pt.lng}">
+        <name>${pt.name}</name>
+        <ele>${pt.ele || 0}</ele>
+      </trkpt>`;
+    });
+
+    gpxContent += `
+    </trkseg>
+  </trk>
+</gpx>`;
+
+    const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${gr.id}_route.gpx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
@@ -428,16 +493,40 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff' }}>{selectedGr.name}</h2>
               </div>
 
-              {/* Action planner compatible uniquement si waypoints pour le moment */}
-              {hasWaypoints && (
-                <button
-                  onClick={() => onSelectGrForPlanner(selectedGr)}
-                  className="btn btn-primary"
-                >
-                  <PlusCircle size={18} />
-                  <span>Ajouter au Planificateur Multi-GR</span>
-                </button>
-              )}
+              {/* Boutons d'action */}
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                {hasWaypoints && (
+                  <button
+                    onClick={() => downloadGpx(selectedGr)}
+                    className="btn"
+                    style={{
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      color: '#60a5fa',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.6rem 1.1rem',
+                      borderRadius: '8px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Download size={18} />
+                    <span>Exporter GPX</span>
+                  </button>
+                )}
+                {hasWaypoints && (
+                  <button
+                    onClick={() => onSelectGrForPlanner(selectedGr)}
+                    className="btn btn-primary"
+                  >
+                    <PlusCircle size={18} />
+                    <span>Ajouter au Planificateur Multi-GR</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Quick Metrics Banner (uniquement si valeurs renseignées) */}
@@ -504,11 +593,35 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
 
                 {/* 2. Liste des Étapes journalières */}
                 {hasStages && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-                      <Layers size={18} color={selectedGr.color} />
-                      Étapes journalières ({selectedGr.stages.length})
-                    </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                        <Layers size={18} color={selectedGr.color} />
+                        Étapes journalières ({selectedGr.stages.length})
+                      </h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(15, 23, 42, 0.4)', padding: '0.35rem 0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Rythme :</span>
+                        <select 
+                          value={hikerProfile} 
+                          onChange={(e) => setHikerProfile(e.target.value)}
+                          style={{
+                            background: 'rgba(15, 23, 42, 0.8)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.5rem',
+                            fontSize: '0.75rem',
+                            outline: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <option value="relaxed">🚶‍♂️ Randonneur tranquille (3.5 km/h)</option>
+                          <option value="active">🥾 Randonneur actif (4.5 km/h)</option>
+                          <option value="runner">🏃‍♂️ Traileur léger (8.0 km/h)</option>
+                          <option value="ultra">⚡ Ultra-traileur (10.0 km/h)</option>
+                        </select>
+                      </div>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                       {selectedGr.stages.map((stage) => (
                         <div 
@@ -531,7 +644,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
                             </div>
                             <div>
                               <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Est: {stage.timeEst}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Est: {getEstimatedTime(stage.distanceKm, stage.dPlus || 0, hikerProfile)}</div>
                             </div>
                           </div>
 
