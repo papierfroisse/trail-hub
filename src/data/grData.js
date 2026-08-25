@@ -958,6 +958,129 @@ export const FAMOUS_GR_LIST = [
       { number: 7, name: "Gordes ➔ Saint-Maximin-la-Sainte-Baume", distanceKm: 120, dPlus: 3600, dMinus: 3660, timeEst: "31h30" },
       { number: 8, name: "Saint-Maximin ➔ Port-Grimaud (Massif des Maures)", distanceKm: 185, dPlus: 5600, dMinus: 5900, timeEst: "48h00" }
     ]
+  },
+  // ──────────────────────────── GR 11 ────────────────────────────
+  {
+    id: "gr11",
+    name: "GR 11 — Tour du Pays d'Île-de-France",
+    shortName: "GR 11",
+    region: "Île-de-France / Picardie",
+    distanceKm: 650,
+    elevationGainM: 6700,
+    elevationLossM: 6700,
+    recommendedDays: 30,
+    difficulty: "Moyen",
+    color: "#6366f1",
+    description: "La boucle externe historique de l'Île-de-France. Ce sentier forestier traverse le Val-d'Oise, l'Oise, la Seine-et-Marne et les Yvelines, offrant une immersion profonde dans les forêts de Chantilly, Fontainebleau et de Rambouillet.",
+    startLocation: "Paris Porte de Saint-Cloud",
+    endLocation: "Porte de Saint-Cloud (boucle)",
+    waypoints: [
+      { name: "Paris (Porte de St-Cloud)", lat: 48.837, lng: 2.253, ele: 35 },
+      { name: "Chantilly", lat: 49.194, lng: 2.478, ele: 60 },
+      { name: "Senlis", lat: 49.206, lng: 2.583, ele: 76 },
+      { name: "Coulommiers", lat: 48.813, lng: 3.091, ele: 80 },
+      { name: "Provins", lat: 48.558, lng: 3.298, ele: 95 },
+      { name: "Fontainebleau", lat: 48.407, lng: 2.702, ele: 79 },
+      { name: "Milly-la-Forêt", lat: 48.402, lng: 2.467, ele: 67 },
+      { name: "Rambouillet", lat: 48.641, lng: 1.844, ele: 140 },
+      { name: "Chevreuse (Vallée)", lat: 48.706, lng: 2.042, ele: 85 },
+      { name: "Mantes-la-Jolie", lat: 48.990, lng: 1.701, ele: 30 }
+    ],
+    stages: [
+      { number: 1, name: "Paris ➔ Chantilly", distanceKm: 48, dPlus: 320, dMinus: 280, timeEst: "12h15" },
+      { number: 2, name: "Chantilly ➔ Senlis", distanceKm: 18, dPlus: 120, dMinus: 100, timeEst: "4h30" },
+      { number: 3, name: "Senlis ➔ Coulommiers", distanceKm: 55, dPlus: 450, dMinus: 420, timeEst: "13h45" },
+      { number: 4, name: "Coulommiers ➔ Provins", distanceKm: 42, dPlus: 350, dMinus: 330, timeEst: "10h30" },
+      { number: 5, name: "Provins ➔ Fontainebleau", distanceKm: 65, dPlus: 480, dMinus: 500, timeEst: "16h15" },
+      { number: 6, name: "Fontainebleau ➔ Milly-la-Forêt", distanceKm: 28, dPlus: 320, dMinus: 330, timeEst: "7h15" },
+      { number: 7, name: "Milly-la-Forêt ➔ Rambouillet", distanceKm: 45, dPlus: 450, dMinus: 380, timeEst: "11h15" },
+      { number: 8, name: "Rambouillet ➔ Chevreuse", distanceKm: 30, dPlus: 220, dMinus: 280, timeEst: "7h30" },
+      { number: 9, name: "Chevreuse ➔ Mantes-la-Jolie", distanceKm: 58, dPlus: 410, dMinus: 460, timeEst: "14h30" },
+      { number: 10, name: "Mantes-la-Jolie ➔ Paris", distanceKm: 72, dPlus: 480, dMinus: 470, timeEst: "18h00" }
+    ]
+  },
+  // ──────────────────────────── GR 12 ────────────────────────────
+  {
+    id: "gr12",
+    name: "GR 12 — Sentier Amsterdam-Paris (Partie France)",
+    shortName: "GR 12",
+    region: "Ardennes / Aisne / Île-de-France",
+    distanceKm: 346,
+    elevationGainM: 3576,
+    elevationLossM: 3920,
+    recommendedDays: 16,
+    difficulty: "Moyen",
+    color: "#8b5cf6",
+    description: "La portion française du grand sentier européen GR 12. Il pénètre en France par le plateau fortifié de Rocroi dans les Ardennes, traverse l'Aisne, l'Oise, les forêts royales de Compiègne et Chantilly et rejoint Paris.",
+    startLocation: "Gué-d'Hossus",
+    endLocation: "Paris (Notre-Dame)",
+    waypoints: [
+      { name: "Gué-d'Hossus (Frontière)", lat: 49.957, lng: 4.604, ele: 380 },
+      { name: "Rocroi", lat: 49.924, lng: 4.520, ele: 385 },
+      { name: "Signy-l'Abbaye", lat: 49.697, lng: 4.417, ele: 165 },
+      { name: "Amifontaine", lat: 49.485, lng: 3.996, ele: 72 },
+      { name: "Vic-sur-Aisne", lat: 49.405, lng: 3.114, ele: 45 },
+      { name: "Pierrefonds", lat: 49.351, lng: 2.981, ele: 85 },
+      { name: "Senlis", lat: 49.206, lng: 2.583, ele: 76 },
+      { name: "Les Étangs de Commelles", lat: 49.124, lng: 2.461, ele: 65 },
+      { name: "Paris (Notre-Dame)", lat: 48.853, lng: 2.350, ele: 35 }
+    ],
+    stages: [
+      { number: 1, name: "Gué-d'Hossus ➔ Rocroi", distanceKm: 8, dPlus: 80, dMinus: 75, timeEst: "2h00" },
+      { number: 2, name: "Rocroi ➔ Signy-l'Abbaye", distanceKm: 42, dPlus: 650, dMinus: 870, timeEst: "11h00" },
+      { number: 3, name: "Signy-l'Abbaye ➔ Amifontaine", distanceKm: 65, dPlus: 520, dMinus: 610, timeEst: "16h30" },
+      { number: 4, name: "Amifontaine ➔ Vic-sur-Aisne", distanceKm: 85, dPlus: 450, dMinus: 470, timeEst: "21h30" },
+      { number: 5, name: "Vic-sur-Aisne ➔ Pierrefonds", distanceKm: 22, dPlus: 280, dMinus: 240, timeEst: "5h45" },
+      { number: 6, name: "Pierrefonds ➔ Senlis", distanceKm: 38, dPlus: 320, dMinus: 330, timeEst: "9h45" },
+      { number: 7, name: "Senlis ➔ Les Étangs de Commelles", distanceKm: 18, dPlus: 110, dMinus: 120, timeEst: "4h30" },
+      { number: 8, name: "Les Étangs de Commelles ➔ Paris", distanceKm: 68, dPlus: 310, dMinus: 340, timeEst: "17h00" }
+    ]
+  },
+  // ──────────────────────────── GR 13 ────────────────────────────
+  {
+    id: "gr13",
+    name: "GR 13 — De Fontainebleau au Morvan",
+    shortName: "GR 13",
+    region: "Bourgogne / Gâtinais / Morvan",
+    distanceKm: 462,
+    elevationGainM: 8200,
+    elevationLossM: 8050,
+    recommendedDays: 22,
+    difficulty: "Soutenu",
+    color: "#06b6d4",
+    description: "Une superbe transition reliant la forêt de Fontainebleau aux contreforts granitiques et sauvages du massif du Morvan. Traverse le Gâtinais, l'Yonne et se termine à la station thermale de Bourbon-Lancy.",
+    startLocation: "Fontainebleau",
+    endLocation: "Bourbon-Lancy",
+    waypoints: [
+      { name: "Fontainebleau", lat: 48.407, lng: 2.702, ele: 79 },
+      { name: "Larchant", lat: 48.284, lng: 2.596, ele: 80 },
+      { name: "Nemours", lat: 48.267, lng: 2.695, ele: 62 },
+      { name: "Souppes-sur-Loing", lat: 48.182, lng: 2.731, ele: 70 },
+      { name: "Montargis", lat: 47.997, lng: 2.738, ele: 85 },
+      { name: "Saint-Maurice-sur-Aveyron", lat: 47.850, lng: 2.926, ele: 135 },
+      { name: "Auxerre", lat: 47.798, lng: 3.573, ele: 100 },
+      { name: "Arcy-sur-Cure", lat: 47.603, lng: 3.759, ele: 130 },
+      { name: "Vézelay", lat: 47.466, lng: 3.742, ele: 300 },
+      { name: "Avallon", lat: 47.490, lng: 3.905, ele: 220 },
+      { name: "Lac des Settons (Morvan)", lat: 47.192, lng: 4.062, ele: 580 },
+      { name: "Haut-Folin (Sommet)", lat: 46.997, lng: 4.020, ele: 901 },
+      { name: "Mont Beuvray (Bibracte)", lat: 46.924, lng: 4.038, ele: 820 },
+      { name: "Bourbon-Lancy", lat: 46.618, lng: 3.774, ele: 240 }
+    ],
+    stages: [
+      { number: 1, name: "Fontainebleau ➔ Larchant", distanceKm: 26, dPlus: 280, dMinus: 275, timeEst: "6h45" },
+      { number: 2, name: "Larchant ➔ Nemours", distanceKm: 12, dPlus: 90, dMinus: 110, timeEst: "3h00" },
+      { number: 3, name: "Nemours ➔ Souppes-sur-Loing", distanceKm: 18, dPlus: 120, dMinus: 110, timeEst: "4h30" },
+      { number: 4, name: "Souppes ➔ Montargis", distanceKm: 34, dPlus: 140, dMinus: 125, timeEst: "8h30" },
+      { number: 5, name: "Montargis ➔ Saint-Maurice-sur-Aveyron", distanceKm: 38, dPlus: 210, dMinus: 160, timeEst: "9h45" },
+      { number: 6, name: "Saint-Maurice ➔ Auxerre", distanceKm: 129, dPlus: 1100, dMinus: 1135, timeEst: "32h00" },
+      { number: 7, name: "Auxerre ➔ Arcy-sur-Cure", distanceKm: 35, dPlus: 450, dMinus: 420, timeEst: "9h00" },
+      { number: 8, name: "Arcy-sur-Cure ➔ Vézelay (Colline éternelle)", distanceKm: 22, dPlus: 380, dMinus: 210, timeEst: "6h00" },
+      { number: 9, name: "Vézelay ➔ Avallon", distanceKm: 24, dPlus: 410, dMinus: 490, timeEst: "6h30" },
+      { number: 10, name: "Avallon ➔ Lac des Settons", distanceKm: 48, dPlus: 1100, dMinus: 740, timeEst: "13h30" },
+      { number: 11, name: "Lac des Settons ➔ Haut-Folin ➔ Bibracte", distanceKm: 41, dPlus: 1400, dMinus: 1160, timeEst: "12h00" },
+      { number: 12, name: "Bibracte ➔ Bourbon-Lancy", distanceKm: 57, dPlus: 600, dMinus: 1180, timeEst: "14h30" }
+    ]
   }
 ];
 
