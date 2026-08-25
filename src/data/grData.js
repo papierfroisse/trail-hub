@@ -1080,8 +1080,117 @@ export const FAMOUS_GR_LIST = [
       { number: 8, name: "Arcy-sur-Cure ➔ Vézelay (Colline éternelle)", distanceKm: 22, dPlus: 380, dMinus: 210, timeEst: "6h00" },
       { number: 9, name: "Vézelay ➔ Avallon", distanceKm: 24, dPlus: 410, dMinus: 490, timeEst: "6h30" },
       { number: 10, name: "Avallon ➔ Lac des Settons", distanceKm: 48, dPlus: 1100, dMinus: 740, timeEst: "13h30" },
-      { number: 11, name: "Lac des Settons ➔ Haut-Folin ➔ Bibracte", distanceKm: 41, dPlus: 1400, dMinus: 1160, timeEst: "12h00" },
       { number: 12, name: "Bibracte ➔ Bourbon-Lancy", distanceKm: 57, dPlus: 600, dMinus: 1180, timeEst: "14h30" }
+    ]
+  },
+  // ──────────────────────────── GR 14 ────────────────────────────
+  {
+    id: "gr14",
+    name: "GR 14 — Sentier de l'Ardenne",
+    shortName: "GR 14",
+    region: "Champagne / Ardennes",
+    distanceKm: 580,
+    elevationGainM: 6200,
+    elevationLossM: 6100,
+    recommendedDays: 25,
+    difficulty: "Moyen",
+    color: "#ec4899",
+    description: "Une magnifique traversée reliant l'est de Paris aux forêts denses et vallonnées des Ardennes. Traverse la Brie, le vignoble champenois, l'Argonne sauvage et se termine à Sedan face à la frontière belge.",
+    startLocation: "Paris Porte de Vincennes",
+    endLocation: "Sedan",
+    waypoints: [
+      { name: "Paris (Porte de Vincennes)", lat: 48.847, lng: 2.408, ele: 45 },
+      { name: "Coulommiers (Brie)", lat: 48.813, lng: 3.091, ele: 80 },
+      { name: "Château-Thierry", lat: 49.043, lng: 3.403, ele: 65 },
+      { name: "Châlons-en-Champagne", lat: 48.956, lng: 4.363, ele: 83 },
+      { name: "Bar-le-Duc", lat: 48.773, lng: 5.163, ele: 185 },
+      { name: "Clermont-en-Argonne", lat: 49.103, lng: 5.072, ele: 230 },
+      { name: "Sedan", lat: 49.701, lng: 4.942, ele: 155 }
+    ],
+    stages: [
+      { number: 1, name: "Paris ➔ Coulommiers", distanceKm: 58, dPlus: 280, dMinus: 240, timeEst: "14h30" },
+      { number: 2, name: "Coulommiers ➔ Château-Thierry", distanceKm: 52, dPlus: 450, dMinus: 460, timeEst: "13h00" },
+      { number: 3, name: "Château-Thierry ➔ Châlons-en-Champagne", distanceKm: 98, dPlus: 780, dMinus: 760, timeEst: "24h30" },
+      { number: 4, name: "Châlons ➔ Bar-le-Duc", distanceKm: 85, dPlus: 620, dMinus: 520, timeEst: "21h15" },
+      { number: 5, name: "Bar-le-Duc ➔ Clermont-en-Argonne", distanceKm: 42, dPlus: 550, dMinus: 500, timeEst: "11h00" },
+      { number: 6, name: "Clermont-en-Argonne ➔ Sedan", distanceKm: 145, dPlus: 1800, dMinus: 1880, timeEst: "36h15" }
+    ]
+  },
+  // ──────────────────────────── GR 15 ────────────────────────────
+  {
+    id: "gr15",
+    name: "GR 15 — Sentier de la Vallée de la Marne",
+    shortName: "GR 15",
+    region: "Île-de-France / Aisne",
+    distanceKm: 180,
+    elevationGainM: 1800,
+    elevationLossM: 1780,
+    recommendedDays: 10,
+    difficulty: "Moyen",
+    color: "#8b5cf6",
+    description: "Le tout nouveau GR francilien (inauguré en 2025). Il suit fidèlement les méandres de la Marne de sa confluence à Paris (Maisons-Alfort) jusqu'à Château-Thierry, conçu pour être parcouru de gare en gare.",
+    startLocation: "Maisons-Alfort",
+    endLocation: "Château-Thierry",
+    waypoints: [
+      { name: "Maisons-Alfort (Confluence)", lat: 48.799, lng: 2.417, ele: 35 },
+      { name: "Château de Vincennes", lat: 48.843, lng: 2.434, ele: 50 },
+      { name: "Joinville-le-Pont", lat: 48.822, lng: 2.470, ele: 42 },
+      { name: "Nogent-sur-Marne", lat: 48.837, lng: 2.483, ele: 40 },
+      { name: "Coubron", lat: 48.915, lng: 2.583, ele: 75 },
+      { name: "Lagny-sur-Marne", lat: 48.878, lng: 2.707, ele: 42 },
+      { name: "Meaux", lat: 48.959, lng: 2.902, ele: 50 },
+      { name: "Trilport", lat: 48.957, lng: 2.946, ele: 53 },
+      { name: "La Ferté-sous-Jouarre", lat: 48.948, lng: 3.128, ele: 62 },
+      { name: "Nanteuil-sur-Marne", lat: 48.979, lng: 3.220, ele: 68 },
+      { name: "Nogent-l'Artaud", lat: 48.966, lng: 3.323, ele: 70 },
+      { name: "Château-Thierry", lat: 49.043, lng: 3.403, ele: 65 }
+    ],
+    stages: [
+      { number: 1, name: "Maisons-Alfort ➔ Château de Vincennes", distanceKm: 11.5, dPlus: 60, dMinus: 45, timeEst: "3h00" },
+      { number: 2, name: "Vincennes ➔ Joinville-le-Pont", distanceKm: 18, dPlus: 120, dMinus: 125, timeEst: "4h30" },
+      { number: 3, name: "Joinville ➔ Nogent ➔ Coubron", distanceKm: 15, dPlus: 140, dMinus: 105, timeEst: "3h45" },
+      { number: 4, name: "Coubron ➔ Lagny-sur-Marne", distanceKm: 21, dPlus: 180, dMinus: 210, timeEst: "5h15" },
+      { number: 5, name: "Lagny ➔ Meaux", distanceKm: 21, dPlus: 160, dMinus: 150, timeEst: "5h15" },
+      { number: 6, name: "Meaux ➔ Trilport", distanceKm: 16, dPlus: 110, dMinus: 105, timeEst: "4h00" },
+      { number: 7, name: "Trilport ➔ La Ferté-sous-Jouarre", distanceKm: 25, dPlus: 280, dMinus: 270, timeEst: "6h15" },
+      { number: 8, name: "La Ferté ➔ Nanteuil-sur-Marne", distanceKm: 18, dPlus: 220, dMinus: 210, timeEst: "4h45" },
+      { number: 9, name: "Nanteuil ➔ Nogent-l'Artaud", distanceKm: 15, dPlus: 190, dMinus: 180, timeEst: "3h45" },
+      { number: 10, name: "Nogent-l'Artaud ➔ Château-Thierry", distanceKm: 20, dPlus: 240, dMinus: 245, timeEst: "5h00" }
+    ]
+  },
+  // ──────────────────────────── GR 16 ────────────────────────────
+  {
+    id: "gr16",
+    name: "GR 16 — Sentier de la Semois",
+    shortName: "GR 16",
+    region: "Ardennes (Belgique / France)",
+    distanceKm: 209,
+    elevationGainM: 4400,
+    elevationLossM: 4650,
+    recommendedDays: 10,
+    difficulty: "Soutenu",
+    color: "#f59e0b",
+    description: "Le superbe sentier forestier qui suit les courbes serrées de la rivière de la Semois depuis sa source à Arlon en Belgique jusqu'à son embouchure sauvage dans la Meuse à Monthermé en France.",
+    startLocation: "Arlon (Belgique)",
+    endLocation: "Monthermé",
+    waypoints: [
+      { name: "Arlon (Belgique)", lat: 49.683, lng: 5.816, ele: 400 },
+      { name: "Étalle", lat: 49.674, lng: 5.597, ele: 340 },
+      { name: "Chiny", lat: 49.739, lng: 5.342, ele: 310 },
+      { name: "Florenville", lat: 49.699, lng: 5.309, ele: 320 },
+      { name: "Herbeumont", lat: 49.782, lng: 5.234, ele: 300 },
+      { name: "Bouillon", lat: 49.794, lng: 5.068, ele: 220 },
+      { name: "Vresse-sur-Semois", lat: 49.872, lng: 4.933, ele: 190 },
+      { name: "Monthermé", lat: 49.886, lng: 4.731, ele: 145 }
+    ],
+    stages: [
+      { number: 1, name: "Arlon ➔ Étalle", distanceKm: 22, dPlus: 120, dMinus: 180, timeEst: "5h30" },
+      { number: 2, name: "Étalle ➔ Chiny", distanceKm: 25, dPlus: 280, dMinus: 310, timeEst: "6h15" },
+      { number: 3, name: "Chiny ➔ Florenville", distanceKm: 18, dPlus: 240, dMinus: 230, timeEst: "4h30" },
+      { number: 4, name: "Florenville ➔ Herbeumont", distanceKm: 28, dPlus: 550, dMinus: 570, timeEst: "7h15" },
+      { number: 5, name: "Herbeumont ➔ Bouillon (Tombeau du Géant)", distanceKm: 32, dPlus: 850, dMinus: 930, timeEst: "8h45" },
+      { number: 6, name: "Bouillon ➔ Vresse-sur-Semois (Crêtes de Frahan)", distanceKm: 42, dPlus: 1200, dMinus: 1230, timeEst: "11h30" },
+      { number: 7, name: "Vresse-sur-Semois ➔ Monthermé", distanceKm: 42, dPlus: 1160, dMinus: 1205, timeEst: "11h15" }
     ]
   }
 ];
