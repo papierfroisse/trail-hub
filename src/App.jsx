@@ -15,6 +15,7 @@ import { ToastProvider, useToast } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { TrailProvider, useTrails } from './context/TrailContext';
 import { GearProvider, useGear } from './context/GearContext';
+import { StravaProvider } from './context/StravaContext';
 import { RefreshCw, X } from 'lucide-react';
 
 function MainAppContent() {
@@ -179,7 +180,9 @@ export default function App() {
       <AuthProvider>
         <TrailProvider>
           <GearProvider>
-            <MainAppContent />
+            <StravaProvider>
+              <MainAppContent />
+            </StravaProvider>
           </GearProvider>
         </TrailProvider>
       </AuthProvider>

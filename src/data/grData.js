@@ -15,6 +15,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert",
     color: "#ef4444",
     description: "Le sentier de grande randonnée le plus dur d'Europe. Traversée nord-sud de la Corse par les crêtes granitiques, de Calenzana à Conca.",
+    stravaRouteUrl: "https://www.strava.com/routes/31518420",
     startLocation: "Calenzana",
     endLocation: "Conca",
     waypoints: [
@@ -69,6 +70,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#3b82f6",
     description: "Le tour du massif du Mont-Blanc à travers 3 pays. Glaciers, cols alpins, vallées verdoyantes. L'un des plus beaux treks d'Europe.",
+    stravaRouteUrl: "https://www.strava.com/routes/28639201",
     startLocation: "Les Houches",
     endLocation: "Les Houches (boucle)",
     waypoints: [

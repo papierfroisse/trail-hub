@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Mountain, Compass, MapPin, Backpack, LayoutDashboard, Settings, Route, LogIn, LogOut, User } from 'lucide-react';
+import { Mountain, Compass, MapPin, Backpack, LayoutDashboard, Settings, Route, LogIn, LogOut, User, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useStrava } from '../context/StravaContext';
 
 export default function Navbar({ activeTab, setActiveTab, onOpenSettings, onOpenAuth }) {
   const { user, signOut, isConfigured } = useAuth();
+  const { isStravaConnected, stravaAthlete, connectStrava, disconnectStrava } = useStrava();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showStravaDropdown, setShowStravaDropdown] = useState(false);
+  const [connectingStrava, setConnectingStrava] = useState(false);
 
   const navItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -81,6 +85,96 @@ export default function Navbar({ activeTab, setActiveTab, onOpenSettings, onOpen
 
         {/* Action Button: Backup/Settings/Auth */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
+          
+          {/* Strava Connection Button */}
+          <div style={{ position: 'relative' }}>
+            {isStravaConnected ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <button
+                  onClick={() => setShowStravaDropdown(!showStravaDropdown)}
+                  className="btn btn-sm"
+                  style={{
+                    background: 'rgba(249, 115, 22, 0.15)',
+                    color: '#fc5200',
+                    border: '1px solid rgba(249, 115, 22, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    padding: '0.4rem 0.85rem'
+                  }}
+                  title={`Connecté en tant que ${stravaAthlete?.firstname}`}
+                >
+                  {stravaAthlete?.profile ? (
+                    <img 
+                      src={stravaAthlete.profile} 
+                      alt="Avatar" 
+                      style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px solid #fc5200' }}
+                    />
+                  ) : (
+                    <Activity size={16} />
+                  )}
+                  <span>Strava</span>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}></span>
+                </button>
+
+                {showStravaDropdown && (
+                  <div className="glass-card" style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: '0.5rem',
+                    width: '200px',
+                    padding: '0.75rem',
+                    zIndex: 110,
+                    background: '#1f2937',
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    <div style={{ fontSize: '0.8rem', color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                      Athlète : <strong>{stravaAthlete?.firstname} {stravaAthlete?.lastname}</strong>
+                      <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{stravaAthlete?.city || 'France'}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        disconnectStrava();
+                        setShowStravaDropdown(false);
+                      }}
+                      className="btn btn-secondary btn-xs"
+                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)', width: '100%' }}
+                    >
+                      Déconnecter Strava
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={async () => {
+                  setConnectingStrava(true);
+                  await connectStrava();
+                  setConnectingStrava(false);
+                }}
+                disabled={connectingStrava}
+                className="btn btn-secondary btn-sm"
+                style={{
+                  background: 'rgba(249, 115, 22, 0.05)',
+                  color: 'var(--text-muted)',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.4rem 0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                <Activity size={16} color="#6b7280" />
+                <span>{connectingStrava ? 'Connexion...' : 'Lier Strava'}</span>
+              </button>
+            )}
+          </div>
+
           <button
             onClick={onOpenSettings}
             className="btn btn-secondary btn-sm"

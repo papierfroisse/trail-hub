@@ -4,7 +4,7 @@ import { ALL_GR_CATALOG } from '../data/allGrCatalog';
 import { CITIES_COORDINATES } from '../data/citiesCoordinates';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download } from 'lucide-react';
+import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download, Activity } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 
 export default function GrCatalog({ onSelectGrForPlanner }) {
@@ -277,6 +277,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
 
   const hasWaypoints = selectedGr && selectedGr.waypoints && selectedGr.waypoints.length > 0;
   const hasStages = selectedGr && selectedGr.stages && selectedGr.stages.length > 0;
+  const climbs = hasWaypoints ? detectClimbs(selectedGr.waypoints) : [];
 
   const getEstimatedTime = (dist, dPlus, profile) => {
     let baseSpeed = 4.5;
@@ -340,6 +341,107 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const getClimbCategory = (dPlus, distKm) => {
+    const score = dPlus * (dPlus / (distKm * 1000 || 1));
+    if (dPlus > 800 || score > 40) return { label: 'Hors Catégorie (HC)', color: '#ef4444' };
+    if (dPlus > 500 || score > 25) return { label: '1ère Catégorie', color: '#f97316' };
+    if (dPlus > 300 || score > 15) return { label: '2ème Catégorie', color: '#eab308' };
+    if (dPlus > 180 || score > 8) return { label: '3ème Catégorie', color: '#3b82f6' };
+    return { label: '4ème Catégorie', color: '#10b981' };
+  };
+
+  const detectClimbs = (waypoints) => {
+    if (!waypoints || waypoints.length < 2) return [];
+    
+    const climbs = [];
+    let currentClimb = null;
+    
+    // Calculer la distance cumulée entre les points
+    const pointsWithDist = [];
+    let totalDist = 0;
+    
+    for (let i = 0; i < waypoints.length; i++) {
+      if (i > 0) {
+        const lat1 = waypoints[i-1].lat * Math.PI / 180;
+        const lon1 = waypoints[i-1].lng * Math.PI / 180;
+        const lat2 = waypoints[i].lat * Math.PI / 180;
+        const lon2 = waypoints[i].lng * Math.PI / 180;
+        const dlat = lat2 - lat1;
+        const dlon = lon2 - lon1;
+        const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        totalDist += 6371 * c;
+      }
+      pointsWithDist.push({
+        ...waypoints[i],
+        dist: totalDist
+      });
+    }
+
+    // Parcourir les points pour détecter les segments ascendants
+    for (let i = 0; i < pointsWithDist.length - 1; i++) {
+      const p1 = pointsWithDist[i];
+      const p2 = pointsWithDist[i+1];
+      const eleDiff = p2.ele - p1.ele;
+      const distDiff = p2.dist - p1.dist;
+      
+      if (eleDiff > 5) { // Ça monte
+        if (!currentClimb) {
+          currentClimb = {
+            startIndex: i,
+            startName: p1.name,
+            startEle: p1.ele,
+            startDist: p1.dist,
+            maxEle: p2.ele,
+            endName: p2.name,
+            endDist: p2.dist,
+            dPlus: eleDiff
+          };
+        } else {
+          currentClimb.maxEle = Math.max(currentClimb.maxEle, p2.ele);
+          currentClimb.endName = p2.name;
+          currentClimb.endDist = p2.dist;
+          currentClimb.dPlus += eleDiff;
+        }
+      } else if (eleDiff < -35) { // Ça descend de façon significative, on clôture la montée en cours
+        if (currentClimb) {
+          const climbDist = currentClimb.endDist - currentClimb.startDist;
+          const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
+          
+          if (currentClimb.dPlus >= 120 && slope >= 2.0) {
+            climbs.push({
+              name: `${currentClimb.startName} ➔ ${currentClimb.endName}`,
+              distanceKm: Math.round(climbDist * 10) / 10,
+              dPlus: Math.round(currentClimb.dPlus),
+              slopeAvg: Math.round(slope * 10) / 10,
+              startEle: currentClimb.startEle,
+              endEle: currentClimb.maxEle
+            });
+          }
+          currentClimb = null;
+        }
+      }
+    }
+    
+    // Si une montée est encore active à la fin
+    if (currentClimb) {
+      const climbDist = currentClimb.endDist - currentClimb.startDist;
+      const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
+      if (currentClimb.dPlus >= 120 && slope >= 2.0) {
+        climbs.push({
+          name: `${currentClimb.startName} ➔ ${currentClimb.endName}`,
+          distanceKm: Math.round(climbDist * 10) / 10,
+          dPlus: Math.round(currentClimb.dPlus),
+          slopeAvg: Math.round(slope * 10) / 10,
+          startEle: currentClimb.startEle,
+          endEle: currentClimb.maxEle
+        });
+      }
+    }
+    
+    return climbs;
   };
 
   return (
@@ -572,6 +674,47 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
               </p>
             </div>
 
+            {/* Volet de liaison GPS / Montre */}
+            {hasWaypoints && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(15, 23, 42, 0.4))',
+                padding: '1.25rem',
+                borderRadius: '12px',
+                border: '1px solid rgba(249, 115, 22, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '1.5rem',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '0.4rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Activity size={16} color="#fc5200" />
+                    Synchroniser sur votre Montre / GPS
+                  </h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5, margin: 0 }}>
+                    Scannez ce QR Code avec votre téléphone pour ouvrir le tracé officiel dans votre application <strong>Strava</strong>. Vous pourrez ensuite le synchroniser directement sur votre montre en 1 clic !
+                  </p>
+                </div>
+                <div style={{
+                  background: '#fff',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(selectedGr.stravaRouteUrl || `https://www.strava.com/routes/explore?query=${selectedGr.shortName}`)}`} 
+                    alt="QR Code de synchronisation montre"
+                    style={{ width: '100px', height: '100px' }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Affichage vertical complet des données du sentier */}
             {(hasStages || hasWaypoints) ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -658,7 +801,53 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
                   </div>
                 )}
 
-                {/* 3. Profil d'Altitude */}
+                {/* 3. Analyse ClimbPro — Détection des cols */}
+                {climbs.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                      <Mountain size={18} color="#fc5200" />
+                      Analyse des Cols (ClimbPro)
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                      {climbs.map((climb, idx) => {
+                        const cat = getClimbCategory(climb.dPlus, climb.distanceKm);
+                        return (
+                          <div 
+                            key={idx}
+                            style={{
+                              padding: '1rem',
+                              borderRadius: '12px',
+                              background: 'rgba(15, 23, 42, 0.65)',
+                              border: '1px solid var(--border-color)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.5rem'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: cat.color }}>
+                                {cat.label}
+                              </span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                Alt: {climb.startEle}m ➔ {climb.endEle}m
+                              </span>
+                            </div>
+                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {climb.name}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
+                              <div>Long. : <strong style={{ color: '#fff' }}>{climb.distanceKm} km</strong></div>
+                              <div>Dénivelé : <strong style={{ color: 'var(--primary-orange)' }}>+{climb.dPlus}m</strong></div>
+                              <div>Pente : <strong style={{ color: '#fff' }}>{climb.slopeAvg}%</strong></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Profil d'Altitude */}
                 {hasWaypoints && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
