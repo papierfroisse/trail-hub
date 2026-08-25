@@ -802,6 +802,162 @@ export const FAMOUS_GR_LIST = [
       { number: 10, name: "Malaucène ➔ Castellane", distanceKm: 160, dPlus: 4200, dMinus: 3840, timeEst: "44h00" },
       { number: 11, name: "Castellane ➔ Grasse", distanceKm: 72, dPlus: 1500, dMinus: 1870, timeEst: "19h30" }
     ]
+  },
+  // ──────────────────────────── GR 6 ────────────────────────────
+  {
+    id: "gr6",
+    name: "GR 6 — Des Alpes à l'Océan",
+    shortName: "GR 6",
+    region: "Provence / Aquitaine / Massif Central",
+    distanceKm: 1360,
+    elevationGainM: 33800,
+    elevationLossM: 35200,
+    recommendedDays: 60,
+    difficulty: "Expert",
+    color: "#ec4899",
+    description: "Une immense traversée d'est en ouest reliant Saint-Paul-sur-Ubaye dans les Alpes de Haute-Provence à Arcachon face à l'océan Atlantique. Il traverse le Luberon, le Pont du Gard, le Mont Aigoual et le Périgord.",
+    startLocation: "Saint-Paul-sur-Ubaye",
+    endLocation: "Arcachon",
+    waypoints: [
+      { name: "Saint-Paul-sur-Ubaye", lat: 44.523, lng: 6.747, ele: 1470 },
+      { name: "Sisteron", lat: 44.195, lng: 5.942, ele: 485 },
+      { name: "Gordes (Luberon)", lat: 43.911, lng: 5.200, ele: 373 },
+      { name: "Tarascon / Beaucaire", lat: 43.805, lng: 4.658, ele: 15 },
+      { name: "Pont du Gard", lat: 43.947, lng: 4.535, ele: 60 },
+      { name: "Anduze (Cévennes)", lat: 44.053, lng: 3.985, ele: 140 },
+      { name: "Mont Aigoual", lat: 44.122, lng: 3.582, ele: 1567 },
+      { name: "Conques (Aveyron)", lat: 44.599, lng: 2.397, ele: 280 },
+      { name: "Figeac", lat: 44.608, lng: 2.031, ele: 220 },
+      { name: "Rocamadour (Quercy)", lat: 44.799, lng: 1.618, ele: 285 },
+      { name: "Sarlat-la-Canéda (Périgord)", lat: 44.889, lng: 1.217, ele: 180 },
+      { name: "Bergerac", lat: 44.853, lng: 0.483, ele: 29 },
+      { name: "Arcachon", lat: 44.658, lng: -1.164, ele: 5 }
+    ],
+    stages: [
+      { number: 1, name: "Saint-Paul-sur-Ubaye ➔ Sisteron", distanceKm: 85, dPlus: 3200, dMinus: 4180, timeEst: "23h00" },
+      { number: 2, name: "Sisteron ➔ Gordes", distanceKm: 95, dPlus: 3100, dMinus: 3210, timeEst: "25h00" },
+      { number: 3, name: "Gordes ➔ Tarascon", distanceKm: 58, dPlus: 850, dMinus: 1200, timeEst: "14h30" },
+      { number: 4, name: "Tarascon ➔ Pont du Gard", distanceKm: 28, dPlus: 320, dMinus: 280, timeEst: "7h00" },
+      { number: 5, name: "Pont du Gard ➔ Anduze", distanceKm: 65, dPlus: 1200, dMinus: 1120, timeEst: "17h00" },
+      { number: 6, name: "Anduze ➔ Sommet du Mont Aigoual", distanceKm: 52, dPlus: 2100, dPlus: 680, timeEst: "14h00" },
+      { number: 7, name: "Mont Aigoual ➔ Conques", distanceKm: 180, dPlus: 4500, dMinus: 5780, timeEst: "48h00" },
+      { number: 8, name: "Conques ➔ Figeac", distanceKm: 45, dPlus: 1100, dMinus: 1160, timeEst: "11h30" },
+      { number: 9, name: "Figeac ➔ Rocamadour", distanceKm: 52, dPlus: 980, dMinus: 910, timeEst: "13h00" },
+      { number: 10, name: "Rocamadour ➔ Sarlat-la-Canéda", distanceKm: 65, dPlus: 1200, dMinus: 1300, timeEst: "16h30" },
+      { number: 11, name: "Sarlat ➔ Bergerac", distanceKm: 98, dPlus: 1450, dMinus: 1600, timeEst: "25h00" },
+      { number: 12, name: "Bergerac ➔ Arcachon (Littoral)", distanceKm: 190, dPlus: 1100, dMinus: 1120, timeEst: "48h00" }
+    ]
+  },
+  // ──────────────────────────── GR 7 ────────────────────────────
+  {
+    id: "gr7",
+    name: "GR 7 — Traversée du Massif Central par les Parcs",
+    shortName: "GR 7",
+    region: "Bourgogne / Auvergne / Occitanie",
+    distanceKm: 780,
+    elevationGainM: 22000,
+    elevationLossM: 22000,
+    recommendedDays: 40,
+    difficulty: "Difficile",
+    color: "#10b981",
+    description: "La grande portion emblématique du GR 7 traversant le Massif central par ses parcs naturels d'exception (Pilat, Monts d'Ardèche, Cévennes, Haut-Languedoc). Suit la ligne de partage des eaux de Mâcon à Castelnaudary.",
+    startLocation: "Mâcon",
+    endLocation: "Castelnaudary",
+    waypoints: [
+      { name: "Mâcon", lat: 46.307, lng: 4.828, ele: 175 },
+      { name: "Saint-Chamond (PNR Pilat)", lat: 45.476, lng: 4.512, ele: 375 },
+      { name: "Saint-Agrève (PNR Monts d'Ardèche)", lat: 45.008, lng: 4.396, ele: 1050 },
+      { name: "La Bastide-Puylaurent", lat: 44.592, lng: 3.905, ele: 1024 },
+      { name: "Le Vigan (Cévennes)", lat: 43.993, lng: 3.606, ele: 230 },
+      { name: "Lodève (PNR Haut-Languedoc)", lat: 43.731, lng: 3.313, ele: 120 },
+      { name: "Castelnaudary", lat: 43.318, lng: 1.953, ele: 165 }
+    ],
+    stages: [
+      { number: 1, name: "Mâcon ➔ Saint-Chamond", distanceKm: 135, dPlus: 3200, dMinus: 3000, timeEst: "34h00" },
+      { number: 2, name: "Saint-Chamond ➔ Saint-Agrève", distanceKm: 110, dPlus: 3100, dMinus: 2420, timeEst: "28h00" },
+      { number: 3, name: "Saint-Agrève ➔ La Bastide-Puylaurent", distanceKm: 105, dPlus: 2800, dMinus: 2820, timeEst: "26h30" },
+      { number: 4, name: "La Bastide-Puylaurent ➔ Le Vigan", distanceKm: 155, dPlus: 5100, dMinus: 5890, timeEst: "40h00" },
+      { number: 5, name: "Le Vigan ➔ Lodève", distanceKm: 115, dPlus: 3600, dMinus: 3710, timeEst: "30h00" },
+      { number: 6, name: "Lodève ➔ Castelnaudary", distanceKm: 160, dPlus: 4200, dMinus: 4160, timeEst: "41h30" }
+    ]
+  },
+  // ──────────────────────────── GR 8 ────────────────────────────
+  {
+    id: "gr8",
+    name: "GR 8 — Sentier de la Côte Atlantique",
+    shortName: "GR 8",
+    region: "Vendée / Aquitaine / Pays Basque",
+    distanceKm: 635,
+    elevationGainM: 6400,
+    elevationLossM: 6330,
+    recommendedDays: 30,
+    difficulty: "Moyen",
+    color: "#0ea5e9",
+    description: "Le magnifique sentier littoral atlantique reliant Saint-Brevin-les-Pins à la frontière espagnole à Sare au Pays Basque. Randonnez entre forêts de pins landaises, dunes, plages sauvages et contreforts pyrénéens.",
+    startLocation: "Saint-Brevin-les-Pins",
+    endLocation: "Sare",
+    waypoints: [
+      { name: "Saint-Brevin-les-Pins", lat: 47.268, lng: -2.169, ele: 5 },
+      { name: "Pornic", lat: 47.115, lng: -2.100, ele: 15 },
+      { name: "Saint-Gilles-Croix-de-Vie", lat: 46.697, lng: -1.942, ele: 10 },
+      { name: "Les Sables-d'Olonne", lat: 46.497, lng: -1.783, ele: 8 },
+      { name: "Royan", lat: 45.634, lng: -1.017, ele: 5 },
+      { name: "Pointe de Grave (bac)", lat: 45.567, lng: -1.225, ele: 5 },
+      { name: "Lacanau-Océan", lat: 44.996, lng: -1.202, ele: 10 },
+      { name: "Arcachon (Dune du Pilat)", lat: 44.658, lng: -1.164, ele: 5 },
+      { name: "Biscarrosse", lat: 44.394, lng: -1.168, ele: 25 },
+      { name: "Hossegor", lat: 43.664, lng: -1.439, ele: 12 },
+      { name: "Sare", lat: 43.313, lng: -1.580, ele: 75 }
+    ],
+    stages: [
+      { number: 1, name: "Saint-Brevin ➔ Pornic", distanceKm: 28, dPlus: 120, dMinus: 110, timeEst: "7h00" },
+      { number: 2, name: "Pornic ➔ Saint-Gilles-Croix-de-Vie", distanceKm: 82, dPlus: 320, dMinus: 325, timeEst: "20h30" },
+      { number: 3, name: "Saint-Gilles ➔ Les Sables-d'Olonne", distanceKm: 35, dPlus: 110, dMinus: 112, timeEst: "8h45" },
+      { number: 4, name: "Les Sables-d'Olonne ➔ Royan", distanceKm: 110, dPlus: 450, dMinus: 455, timeEst: "27h30" },
+      { number: 5, name: "Royan ➔ Pointe de Grave (Bac) ➔ Lacanau", distanceKm: 78, dPlus: 280, dMinus: 275, timeEst: "19h30" },
+      { number: 6, name: "Lacanau ➔ Arcachon", distanceKm: 42, dPlus: 180, dMinus: 185, timeEst: "10h30" },
+      { number: 7, name: "Arcachon ➔ Biscarrosse", distanceKm: 38, dPlus: 240, dMinus: 220, timeEst: "9h30" },
+      { number: 8, name: "Biscarrosse ➔ Hossegor", distanceKm: 145, dPlus: 850, dMinus: 860, timeEst: "36h15" },
+      { number: 9, name: "Hossegor ➔ Sare (frontière espagnole)", distanceKm: 77, dPlus: 1200, dMinus: 1135, timeEst: "19h30" }
+    ]
+  },
+  // ──────────────────────────── GR 9 ────────────────────────────
+  {
+    id: "gr9",
+    name: "GR 9 — Du Jura à la Méditerranée",
+    shortName: "GR 9",
+    region: "Jura / Savoie / Vercors / Luberon",
+    distanceKm: 970,
+    elevationGainM: 37883,
+    elevationLossM: 38220,
+    recommendedDays: 48,
+    difficulty: "Soutenu",
+    color: "#f59e0b",
+    description: "Une exceptionnelle traversée du nord au sud, reliant Saint-Amour dans le Jura à Port-Grimaud au bord du golfe de Saint-Tropez. Un sentier montagnard sauvage traversant la Chartreuse, le Vercors, le Ventoux et le Luberon.",
+    startLocation: "Saint-Amour",
+    endLocation: "Port-Grimaud",
+    waypoints: [
+      { name: "Saint-Amour", lat: 46.435, lng: 5.342, ele: 340 },
+      { name: "Mijoux (Haut-Jura)", lat: 46.368, lng: 6.002, ele: 1000 },
+      { name: "Culoz", lat: 45.849, lng: 5.782, ele: 250 },
+      { name: "Grenoble (Fort de la Bastille)", lat: 45.198, lng: 5.725, ele: 476 },
+      { name: "Léoncel (Vercors)", lat: 44.910, lng: 5.193, ele: 910 },
+      { name: "Séderon (Baronnies)", lat: 44.205, lng: 5.539, ele: 810 },
+      { name: "Sommet du Mont Ventoux", lat: 44.174, lng: 5.278, ele: 1909 },
+      { name: "Gordes (Luberon)", lat: 43.911, lng: 5.200, ele: 373 },
+      { name: "Saint-Maximin (Sainte-Baume)", lat: 43.453, lng: 5.863, ele: 310 },
+      { name: "Port-Grimaud", lat: 43.272, lng: 6.579, ele: 5 }
+    ],
+    stages: [
+      { number: 1, name: "Saint-Amour ➔ Mijoux (Parc du Jura)", distanceKm: 65, dPlus: 2100, dMinus: 1440, timeEst: "17h15" },
+      { number: 2, name: "Mijoux ➔ Culoz (Vallée du Rhône)", distanceKm: 98, dPlus: 3100, dMinus: 3850, timeEst: "26h00" },
+      { number: 3, name: "Culoz ➔ Grenoble (Massif de la Chartreuse)", distanceKm: 135, dPlus: 5200, dMinus: 4980, timeEst: "36h00" },
+      { number: 4, name: "Grenoble ➔ Léoncel (Massif du Vercors)", distanceKm: 110, dPlus: 4500, dMinus: 4060, timeEst: "29h00" },
+      { number: 5, name: "Léoncel ➔ Séderon (Drôme Provençale)", distanceKm: 142, dPlus: 5400, dMinus: 5500, timeEst: "38h00" },
+      { number: 6, name: "Séderon ➔ Sommet du Ventoux ➔ Gordes", distanceKm: 115, dPlus: 4100, dMinus: 4530, timeEst: "31h00" },
+      { number: 7, name: "Gordes ➔ Saint-Maximin-la-Sainte-Baume", distanceKm: 120, dPlus: 3600, dMinus: 3660, timeEst: "31h30" },
+      { number: 8, name: "Saint-Maximin ➔ Port-Grimaud (Massif des Maures)", distanceKm: 185, dPlus: 5600, dMinus: 5900, timeEst: "48h00" }
+    ]
   }
 ];
 
