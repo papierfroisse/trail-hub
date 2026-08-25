@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { ArrowLeft, MapPin, Mountain, Calendar, CheckCircle2, Download, Backpack, Layers } from 'lucide-react';
+import RaceStrategyCalculator from './RaceStrategyCalculator';
+import { ArrowLeft, MapPin, Mountain, Calendar, CheckCircle2, Download, Backpack, Layers, Calculator } from 'lucide-react';
 import { generateGPXString } from '../utils/gpxParser';
 
 export default function TrailDetail({ trail, onBack, onOpenChecklist }) {
+  const [hoverPoint, setHoverPoint] = useState(null);
+
   if (!trail) return null;
 
   const handleDownloadGpx = () => {
@@ -93,31 +96,36 @@ export default function TrailDetail({ trail, onBack, onOpenChecklist }) {
         </div>
       </div>
 
-      {/* Map & Elevation Grid */}
+      {/* Map & Synchronized Elevation Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
         <div className="glass-card" style={{ padding: '1.5rem' }}>
           <h3 style={{ color: '#fff', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <MapPin size={20} color="var(--primary-orange)" /> Carte de l'Itinéraire
+            <MapPin size={20} color="var(--primary-orange)" /> Carte de l'Itinéraire (Survol synchro)
           </h3>
           <GpxMap 
             waypoints={trail.waypoints || []} 
             trackPoints={trail.trackPoints || []} 
             height="380px" 
-            color="var(--primary-orange)" 
+            color="var(--primary-orange)"
+            hoverPoint={hoverPoint}
           />
         </div>
 
         <div className="glass-card" style={{ padding: '1.5rem' }}>
           <h3 style={{ color: '#fff', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Mountain size={20} color="var(--emerald-green)" /> Profil Altimétrique
+            <Mountain size={20} color="var(--emerald-green)" /> Profil Altimétrique (Survoler pour repérer sur la carte)
           </h3>
           <ElevationProfile 
             profileData={trail.elevationProfile || []} 
             color="var(--emerald-green)" 
             height="350px" 
+            onHoverPoint={setHoverPoint}
           />
         </div>
       </div>
+
+      {/* Race Strategy & Performance Calculator */}
+      <RaceStrategyCalculator trail={trail} />
 
       {/* Stage Table if Multi-GR */}
       {trail.stages && trail.stages.length > 0 && (

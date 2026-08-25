@@ -31,11 +31,27 @@ const createCustomIcon = (color, label) => {
   });
 };
 
-const startIcon = createCustomIcon('#10b981', 'D'); // Depart (Green)
-const endIcon = createCustomIcon('#ef4444', 'A');   // Arrivee (Red)
-const waypointIcon = createCustomIcon('#3b82f6', '•'); // Waypoint (Blue)
+const hoverIcon = L.divIcon({
+  className: 'custom-hover-marker',
+  html: `
+    <div style="
+      background-color: #f97316;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 15px #f97316;
+      animation: pulse 1.5s infinite;
+    "></div>
+  `,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
+});
 
-// Ajustement automatique des limites de la carte
+const startIcon = createCustomIcon('#10b981', 'D'); // Depart
+const endIcon = createCustomIcon('#ef4444', 'A');   // Arrivee
+const waypointIcon = createCustomIcon('#3b82f6', '•'); // Waypoint
+
 function MapBoundsFitter({ points }) {
   const map = useMap();
 
@@ -49,8 +65,7 @@ function MapBoundsFitter({ points }) {
   return null;
 }
 
-export default function GpxMap({ waypoints = [], trackPoints = [], height = "420px", color = "#f97316" }) {
-  // Déterminer le centre initial de la carte
+export default function GpxMap({ waypoints = [], trackPoints = [], height = "420px", color = "#f97316", hoverPoint = null }) {
   const center = waypoints.length > 0 
     ? [waypoints[0].lat, waypoints[0].lng] 
     : (trackPoints.length > 0 ? [trackPoints[0].lat, trackPoints[0].lng] : [45.0, 6.0]);
@@ -72,12 +87,21 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Tracé de la trace en ligne */}
         {polylinePositions.length > 0 && (
           <Polyline 
             positions={polylinePositions} 
             pathOptions={{ color: color, weight: 4, opacity: 0.85 }} 
           />
+        )}
+
+        {/* Marqueur du point survolé sur le profil d'altitude (Synchronisation) */}
+        {hoverPoint && hoverPoint.lat && hoverPoint.lng && (
+          <Marker position={[hoverPoint.lat, hoverPoint.lng]} icon={hoverIcon}>
+            <Popup autoPan={false}>
+              <strong>Survol : {hoverPoint.dist} km</strong>
+              <div>Altitude : {hoverPoint.ele} m</div>
+            </Popup>
+          </Marker>
         )}
 
         {/* Marqueur de départ */}
@@ -90,7 +114,7 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
           </Marker>
         )}
 
-        {/* Marqueurs intermédiaires (Waypoints) */}
+        {/* Waypoints */}
         {waypoints.slice(1, -1).map((wpt, idx) => (
           <Marker key={idx} position={[wpt.lat, wpt.lng]} icon={waypointIcon}>
             <Popup>
@@ -100,7 +124,7 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
           </Marker>
         ))}
 
-        {/* Marqueur d'arrivée */}
+        {/* Arrivée */}
         {waypoints.length > 1 && (
           <Marker position={[waypoints[waypoints.length - 1].lat, waypoints[waypoints.length - 1].lng]} icon={endIcon}>
             <Popup>
@@ -110,7 +134,6 @@ export default function GpxMap({ waypoints = [], trackPoints = [], height = "420
           </Marker>
         )}
 
-        {/* Fit Bounds */}
         <MapBoundsFitter points={waypoints.length > 0 ? waypoints : trackPoints} />
       </MapContainer>
     </div>

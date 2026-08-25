@@ -23,7 +23,7 @@ ChartJS.register(
   Filler
 );
 
-export default function ElevationProfile({ profileData = [], color = "#f97316", height = "260px" }) {
+export default function ElevationProfile({ profileData = [], color = "#f97316", height = "260px", onHoverPoint }) {
   if (!profileData || profileData.length === 0) {
     return (
       <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: '14px', border: '1px dashed var(--border-color)', color: 'var(--text-muted)' }}>
@@ -67,6 +67,15 @@ export default function ElevationProfile({ profileData = [], color = "#f97316", 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    onHover: (event, chartElements) => {
+      if (chartElements && chartElements.length > 0 && onHoverPoint) {
+        const index = chartElements[0].index;
+        const pt = profileData[index];
+        if (pt) {
+          onHoverPoint(pt);
+        }
+      }
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
