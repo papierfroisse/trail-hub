@@ -274,89 +274,84 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
               </p>
             </div>
 
-            {/* Onglets uniquement si étapes ou carte */}
+            {/* Affichage vertical complet des données du sentier */}
             {(hasStages || hasWaypoints) ? (
-              <>
-                <div style={{ display: 'flex', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-                  {hasStages && (
-                    <button
-                      onClick={() => setActiveViewMode('stages')}
-                      className={`btn btn-sm ${activeViewMode === 'stages' ? 'btn-primary' : 'btn-secondary'}`}
-                    >
-                      <Layers size={16} /> Étapes ({selectedGr.stages.length})
-                    </button>
-                  )}
-                  {hasWaypoints && (
-                    <button
-                      onClick={() => setActiveViewMode('map')}
-                      className={`btn btn-sm ${activeViewMode === 'map' ? 'btn-primary' : 'btn-secondary'}`}
-                    >
-                      <MapPin size={16} /> Carte interactive
-                    </button>
-                  )}
-                  {hasWaypoints && (
-                    <button
-                      onClick={() => setActiveViewMode('profile')}
-                      className={`btn btn-sm ${activeViewMode === 'profile' ? 'btn-primary' : 'btn-secondary'}`}
-                    >
-                      <Mountain size={16} /> Profil d'altitude
-                    </button>
-                  )}
-                </div>
-
-                {/* Tab View Content */}
-                {activeViewMode === 'stages' && hasStages && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                    {selectedGr.stages.map((stage) => (
-                      <div 
-                        key={stage.number}
-                        style={{
-                          padding: '0.85rem 1.1rem',
-                          borderRadius: '10px',
-                          background: 'rgba(15, 23, 42, 0.7)',
-                          border: '1px solid var(--border-color)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          flexWrap: 'wrap',
-                          gap: '0.75rem'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${selectedGr.color}22`, color: selectedGr.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem' }}>
-                            {stage.number}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Est: {stage.timeEst}</div>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
-                          <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
-                        </div>
-                      </div>
-                    ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                
+                {/* 1. Carte Interactive */}
+                {hasWaypoints && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                      <MapPin size={18} color={selectedGr.color} />
+                      Carte interactive du tracé
+                    </h3>
+                    <GpxMap 
+                      waypoints={selectedGr.waypoints} 
+                      height="380px" 
+                      color={selectedGr.color} 
+                    />
                   </div>
                 )}
 
-                {activeViewMode === 'map' && hasWaypoints && (
-                  <GpxMap 
-                    waypoints={selectedGr.waypoints} 
-                    height="350px" 
-                    color={selectedGr.color} 
-                  />
+                {/* 2. Liste des Étapes journalières */}
+                {hasStages && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                      <Layers size={18} color={selectedGr.color} />
+                      Étapes journalières ({selectedGr.stages.length})
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                      {selectedGr.stages.map((stage) => (
+                        <div 
+                          key={stage.number}
+                          style={{
+                            padding: '0.85rem 1.1rem',
+                            borderRadius: '10px',
+                            background: 'rgba(15, 23, 42, 0.7)',
+                            border: '1px solid var(--border-color)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '0.75rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${selectedGr.color}22`, color: selectedGr.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem' }}>
+                              {stage.number}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Est: {stage.timeEst}</div>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                            <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
+                            <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
 
-                {activeViewMode === 'profile' && hasWaypoints && (
-                  <ElevationProfile 
-                    profileData={generateMockProfileFromWaypoints(selectedGr.waypoints, selectedGr.distanceKm)}
-                    color={selectedGr.color}
-                    height="280px"
-                  />
+                {/* 3. Profil d'Altitude */}
+                {hasWaypoints && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                      <Mountain size={18} color={selectedGr.color} />
+                      Profil de dénivelé altimétrique
+                    </h3>
+                    <ElevationProfile 
+                      profileData={generateMockProfileFromWaypoints(selectedGr.waypoints, selectedGr.distanceKm)}
+                      color={selectedGr.color}
+                      height="280px"
+                    />
+                  </div>
                 )}
-              </>
+
+              </div>
             ) : (
               <div style={{ padding: '1.5rem', background: 'rgba(15, 23, 42, 0.3)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                 💡 Utilisez le bouton d'import GPX dans <strong>Mes Trails & GPX</strong> pour charger le tracé exact de ce GR et générer son profil altimétrique dynamique.

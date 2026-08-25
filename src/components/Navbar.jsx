@@ -25,7 +25,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenSettings, onOpen
   };
 
   return (
-    <header className="glass-card" style={{ borderRadius: 0, borderTop: 0, borderLeft: 0, borderRight: 0, position: 'sticky', top: 0, zIndex: 100 }}>
+    <header style={{ background: '#0f172a', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{ maxWidth: '1380px', margin: '0 auto', padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         
         {/* Logo */}

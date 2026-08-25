@@ -195,64 +195,16 @@ export default function BikeCatalog({ onSaveAsPersonalTrail }) {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
               {selectedRoute.description}
             </p>
+            {/* Affichage complet vertical */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              
+              {/* 1. Carte & Points de service (WC, Eau) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                  <MapPin size={18} color={selectedRoute.color} />
+                  Carte & Points de service (WC, Eau, Réparation)
+                </h3>
 
-            {/* Tabs & View selection */}
-            <div style={{ display: 'flex', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-              <button
-                onClick={() => setActiveViewMode('stages')}
-                className={`btn btn-sm ${activeViewMode === 'stages' ? 'btn-primary' : 'btn-secondary'}`}
-              >
-                <Layers size={16} /> Fiche & Étapes ({selectedRoute.stages.length})
-              </button>
-              <button
-                onClick={() => setActiveViewMode('map')}
-                className={`btn btn-sm ${activeViewMode === 'map' ? 'btn-primary' : 'btn-secondary'}`}
-              >
-                <MapPin size={16} /> Carte & Points de service (WC, Eau)
-              </button>
-            </div>
-
-            {/* Stages View */}
-            {activeViewMode === 'stages' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                {selectedRoute.stages.map((stage) => (
-                  <div
-                    key={stage.number}
-                    style={{
-                      padding: '0.85rem 1.1rem',
-                      borderRadius: '10px',
-                      background: 'rgba(15, 23, 42, 0.7)',
-                      border: '1px solid var(--border-color)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '0.75rem'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${selectedRoute.color}22`, color: selectedRoute.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
-                        {stage.number}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Temps de selle approx: {stage.timeEst}</div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
-                      <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Interactive Map View with POI Filters */}
-            {activeViewMode === 'map' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                
                 {/* POI Toggle Filters Bar */}
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(15, 23, 42, 0.6)', padding: '0.75rem 1.25rem', borderRadius: '10px', border: '1px solid var(--border-color)', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fff' }}>Filtrer les services sur la route :</span>
@@ -263,21 +215,21 @@ export default function BikeCatalog({ onSaveAsPersonalTrail }) {
                       className={`btn btn-sm ${showToilets ? 'btn-primary' : 'btn-secondary'}`}
                       style={{ background: showToilets ? '#3b82f6' : 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f644' }}
                     >
-                      <span>🚾 Toilettes publiques</span>
+                      <span>🚾 Toilettes</span>
                     </button>
                     <button
                       onClick={() => setShowWater(!showWater)}
                       className={`btn btn-sm ${showWater ? 'btn-primary' : 'btn-secondary'}`}
                       style={{ background: showWater ? '#06b6d4' : 'rgba(6, 182, 212, 0.1)', border: '1px solid #06b6d444' }}
                     >
-                      <span>🚰 Points d'eau potable</span>
+                      <span>🚰 Eau potable</span>
                     </button>
                     <button
                       onClick={() => setShowRepairs(!showRepairs)}
                       className={`btn btn-sm ${showRepairs ? 'btn-primary' : 'btn-secondary'}`}
                       style={{ background: showRepairs ? '#f59e0b' : 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b44' }}
                     >
-                      <span>🔧 Bornes réparation</span>
+                      <span>🔧 Réparation</span>
                     </button>
                   </div>
                 </div>
@@ -287,15 +239,57 @@ export default function BikeCatalog({ onSaveAsPersonalTrail }) {
                   waypoints={selectedRoute.waypoints}
                   pois={getFilteredPois()}
                   color={selectedRoute.color}
-                  height="400px"
+                  height="380px"
                 />
+              </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  <AlertCircle size={14} color="var(--primary-orange)" />
-                  <span>Cliquez sur les marqueurs des services 🚾/🚰/🔧 pour voir les détails ou les remarques d'accessibilité.</span>
+              {/* 2. Liste des étapes journalières */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                  <Layers size={18} color={selectedRoute.color} />
+                  Étapes journalières ({selectedRoute.stages.length})
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                  {selectedRoute.stages.map((stage) => (
+                    <div
+                      key={stage.number}
+                      style={{
+                        padding: '0.85rem 1.1rem',
+                        borderRadius: '10px',
+                        background: 'rgba(15, 23, 42, 0.7)',
+                        border: '1px solid var(--border-color)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${selectedRoute.color}22`, color: selectedRoute.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
+                          {stage.number}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>{stage.name}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Temps de selle approx: {stage.timeEst}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
+                        <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
+
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1.5rem' }}>
+              <AlertCircle size={14} color="var(--primary-orange)" />
+              <span>Cliquez sur les marqueurs des services 🚾/🚰/🔧 pour voir les détails ou les remarques d'accessibilité.</span>
+            </div>
 
           </div>
         ) : (
