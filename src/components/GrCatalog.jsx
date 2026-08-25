@@ -21,7 +21,129 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   // Liste complète triée (Majeurs + Secondaires)
   const sortedAllGrList = [...FAMOUS_GR_LIST, ...ALL_GR_CATALOG].sort((a, b) => getGrNumber(a) - getGrNumber(b));
 
-  // Fusionner les listes ou filtrer selon l'onglet actif
+  // Générateur dynamique d'étapes et de coordonnées pour les GR non détaillés
+  const enrichSimpleGr = (gr) => {
+    if (!gr) return null;
+    if (gr.stages && gr.stages.length > 0) return gr; // Déjà détaillé
+
+    const cities = gr.description.split(' • ').map(c => c.trim().replace(/\(.*?\)/g, '').trim()).filter(c => c.length > 1);
+    const citiesCount = cities.length;
+    
+    // Inferrer la distance si non spécifiée (22km par ville listée)
+    const dist = gr.distanceKm || (citiesCount > 1 ? citiesCount * 22 : 120);
+    
+    // Déterminer le profil géographique de la région
+    let reliefMaxEle = 120; // Bassin parisien plat
+    let baseCoords = { lat: 46.5, lng: 2.5 }; // Centre France
+    let roughness = 0.05; // Plaine
+    
+    const reg = (gr.region || '').toLowerCase();
+    if (reg.includes('alpes') || reg.includes('mercantour')) {
+      reliefMaxEle = 2600;
+      baseCoords = { lat: 45.0, lng: 6.2 }; // Alpes
+      roughness = 0.25;
+    } else if (reg.includes('pyrénées')) {
+      reliefMaxEle = 2400;
+      baseCoords = { lat: 42.8, lng: 0.5 }; // Pyrénées
+      roughness = 0.22;
+    } else if (reg.includes('corse')) {
+      reliefMaxEle = 2100;
+      baseCoords = { lat: 42.1, lng: 9.1 }; // Corse
+      roughness = 0.20;
+    } else if (reg.includes('massif central') || reg.includes('auvergne') || reg.includes('cévennes')) {
+      reliefMaxEle = 1400;
+      baseCoords = { lat: 45.2, lng: 3.0 }; // Auvergne
+      roughness = 0.15;
+    } else if (reg.includes('bretagne')) {
+      reliefMaxEle = 320;
+      baseCoords = { lat: 48.2, lng: -3.0 }; // Bretagne
+      roughness = 0.08;
+    } else if (reg.includes('normandie')) {
+      reliefMaxEle = 300;
+      baseCoords = { lat: 49.2, lng: -0.5 }; // Normandie
+      roughness = 0.07;
+    } else if (reg.includes('jura')) {
+      reliefMaxEle = 1500;
+      baseCoords = { lat: 46.8, lng: 6.0 }; // Jura
+      roughness = 0.18;
+    } else if (reg.includes('vosges') || reg.includes('alsace')) {
+      reliefMaxEle = 1200;
+      baseCoords = { lat: 48.0, lng: 7.0 }; // Vosges
+      roughness = 0.14;
+    } else if (reg.includes('provence') || reg.includes('var') || reg.includes('marseille')) {
+      reliefMaxEle = 900;
+      baseCoords = { lat: 43.6, lng: 5.8 }; // Provence
+      roughness = 0.12;
+    } else if (reg.includes('réunion')) {
+      reliefMaxEle = 2800;
+      baseCoords = { lat: -21.1, lng: 55.5 }; // La Réunion
+      roughness = 0.30;
+    } else if (reg.includes('guadeloupe')) {
+      reliefMaxEle = 1200;
+      baseCoords = { lat: 16.15, lng: -61.65 }; // Guadeloupe
+      roughness = 0.22;
+    } else if (reg.includes('martinique')) {
+      reliefMaxEle = 1100;
+      baseCoords = { lat: 14.65, lng: -61.0 }; // Martinique
+      roughness = 0.20;
+    }
+
+    // Calculer les étapes
+    const numStages = Math.max(Math.ceil(dist / 22), 2);
+    const distPerStage = dist / numStages;
+    const stages = [];
+    let accumulatedDPlus = 0;
+
+    for (let i = 1; i <= numStages; i++) {
+      const startCity = cities[(i - 1) % citiesCount] || `Départ Étape ${i}`;
+      const endCity = cities[i % citiesCount] || `Arrivée Étape ${i}`;
+      
+      // Simuler D+ cohérent selon la région
+      const stageDPlus = Math.round((0.65 + Math.random() * 0.7) * (reliefMaxEle / 3.5));
+      accumulatedDPlus += stageDPlus;
+
+      // Estimer la vitesse moyenne selon le relief (4km/h à plat, moins en montagne)
+      const speed = 4 - (stageDPlus / 500);
+      const activeSpeed = Math.max(speed, 2.2);
+      const rawHours = distPerStage / activeSpeed;
+      const hours = Math.floor(rawHours);
+      const minutes = Math.round((rawHours % 1) * 60);
+
+      stages.push({
+        number: i,
+        name: `${startCity} ➔ ${endCity}`,
+        distanceKm: Math.round(distPerStage * 10) / 10,
+        dPlus: stageDPlus,
+        timeEst: `${hours}h${minutes < 10 ? '0' : ''}${minutes}`
+      });
+    }
+
+    // Créer des waypoints cartographiques simulés décrivant une courbe dans la région
+    const waypoints = [];
+    for (let i = 0; i <= numStages; i++) {
+      const cityName = cities[i % citiesCount] || `Point intermédiaire ${i}`;
+      const angle = (i / numStages) * Math.PI * 1.5; // Décrit un arc de cercle
+      const radius = 0.3 + (i * 0.08); // Rayon progressif pour un tracé sinueux
+
+      waypoints.push({
+        name: cityName,
+        lat: baseCoords.lat + Math.sin(angle) * radius + (Math.random() - 0.5) * 0.04,
+        lng: baseCoords.lng + Math.cos(angle) * radius + (Math.random() - 0.5) * 0.04,
+        ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.6))
+      });
+    }
+
+    return {
+      ...gr,
+      distanceKm: Math.round(dist),
+      elevationGainM: accumulatedDPlus,
+      recommendedDays: numStages,
+      stages,
+      waypoints
+    };
+  };
+
+  // Liste fusionnée
   const currentCatalogList = activeCatalogTab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
 
   const filteredGrs = currentCatalogList.filter(gr => 
@@ -31,24 +153,15 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   );
 
   const handleSelectGr = (gr) => {
-    setSelectedGr(gr);
-    // Basculer sur 'stages' ou 'details' selon la présence d'étapes
-    if (gr.stages && gr.stages.length > 0) {
-      setActiveViewMode('stages');
-    } else {
-      setActiveViewMode('details');
-    }
+    setSelectedGr(enrichSimpleGr(gr));
+    setActiveViewMode('stages');
   };
 
   const handleTabChange = (tab) => {
     setActiveCatalogTab(tab);
     const list = tab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
-    setSelectedGr(list[0]);
-    if (list[0].stages) {
-      setActiveViewMode('stages');
-    } else {
-      setActiveViewMode('details');
-    }
+    setSelectedGr(enrichSimpleGr(list[0]));
+    setActiveViewMode('stages');
   };
 
   // Générer un profil d'altitude fictif réaliste pour l'aperçu si aucun GPX brut n'est chargé
