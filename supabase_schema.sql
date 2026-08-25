@@ -96,3 +96,30 @@ alter table public.gear enable row level security;
 -- Politiques RLS
 create policy "Les utilisateurs accèdent à leur propre matériel" 
   on public.gear for all using (auth.uid() = user_id);
+
+
+----------------------------------------------------
+-- 4. Table Gr_routes (Catalogue officiel des GR réels)
+----------------------------------------------------
+create table if not exists public.gr_routes (
+  id text primary key,
+  name text not null,
+  short_name text not null,
+  region text,
+  color text not null,
+  distance_km double precision not null default 0,
+  elevation_gain_m integer not null default 0,
+  recommended_days integer not null default 1,
+  description text,
+  waypoints jsonb default '[]'::jsonb, -- Contient les vrais points lat/lng du tracé
+  stages jsonb default '[]'::jsonb,     -- Contient les étapes réelles
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Activation de RLS
+alter table public.gr_routes enable row level security;
+
+-- Politiques RLS (Lecture publique autorisée, modifications réservées aux administrateurs)
+create policy "Tout le monde peut lire le catalogue des GR" 
+  on public.gr_routes for select using (true);
+

@@ -1,110 +1,221 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FAMOUS_GR_LIST } from '../data/grData';
 import { ALL_GR_CATALOG } from '../data/allGrCatalog';
+import { CITIES_COORDINATES } from '../data/citiesCoordinates';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
 import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 
 export default function GrCatalog({ onSelectGrForPlanner }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCatalogTab, setActiveCatalogTab] = useState('famous'); // 'famous' | 'all'
-  const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
-  const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
-
+  
   // Fonction pour extraire le numéro du GR afin de trier numériquement
   const getGrNumber = (gr) => {
+    if (!gr) return 9999;
     if (gr.num) return parseInt(gr.num, 10);
-    const match = gr.shortName.match(/\d+/);
+    const match = (gr.shortName || '').match(/\d+/);
     return match ? parseInt(match[0], 10) : 9999;
   };
 
-  // Liste complète triée (Majeurs + Secondaires)
+  // Liste complète triée statique (Fallback)
   const sortedAllGrList = [...FAMOUS_GR_LIST, ...ALL_GR_CATALOG].sort((a, b) => getGrNumber(a) - getGrNumber(b));
 
-  // Générateur dynamique d'étapes et de coordonnées pour les GR non détaillés
+  const [famousGrs, setFamousGrs] = useState(FAMOUS_GR_LIST);
+  const [allGrs, setAllGrs] = useState(sortedAllGrList);
+  const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
+  const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
+  const [loadingDb, setLoadingDb] = useState(false);
+
+  // Charger les GR réels depuis Supabase si configuré
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchGrsFromDb = async () => {
+      setLoadingDb(true);
+      try {
+        const { data, error } = await supabase
+          .from('gr_routes')
+          .select('*');
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const formatted = data.map(gr => ({
+            id: gr.id,
+            name: gr.name,
+            shortName: gr.short_name,
+            region: gr.region,
+            color: gr.color,
+            distanceKm: gr.distance_km,
+            elevationGainM: gr.elevation_gain_m,
+            recommendedDays: gr.recommended_days,
+            description: gr.description,
+            stages: gr.stages || [],
+            waypoints: gr.waypoints || [],
+            isDetailed: gr.stages && gr.stages.length > 0
+          }));
+
+          // Les GR Majeurs (ceux avec étapes détaillées)
+          const famous = formatted.filter(gr => gr.isDetailed || ['gr20', 'gr21', 'gr34', 'gr52', 'gr54', 'gr58', 'gr65', 'gr70', 'gr400', 'gr738', 'gr5', 'gr10'].includes(gr.id));
+          // Tous les GR triés numériquement
+          const sortedAll = [...formatted].sort((a, b) => getGrNumber(a) - getGrNumber(b));
+
+          setFamousGrs(famous);
+          setAllGrs(sortedAll);
+
+          // Mettre à jour le GR sélectionné si présent en base
+          const match = formatted.find(g => g.id === selectedGr.id);
+          if (match) {
+            setSelectedGr(match);
+          } else {
+            setSelectedGr(famous[0] || formatted[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération des GR Supabase:", err);
+      } finally {
+        setLoadingDb(false);
+      }
+    };
+
+    fetchGrsFromDb();
+  }, []);
+
+  // Générateur dynamique d'étapes et de coordonnées réelles à partir du dictionnaire de villes
   const enrichSimpleGr = (gr) => {
     if (!gr) return null;
     if (gr.stages && gr.stages.length > 0) return gr; // Déjà détaillé
 
-    const cities = gr.description.split(' • ').map(c => c.trim().replace(/\(.*?\)/g, '').trim()).filter(c => c.length > 1);
+    const rawCities = gr.description.split(' • ').map(c => c.trim().replace(/\(.*?\)/g, '').trim());
+    const cities = rawCities.filter(c => c.length > 1);
     const citiesCount = cities.length;
-    
-    // Inferrer la distance si non spécifiée (22km par ville listée)
-    const dist = gr.distanceKm || (citiesCount > 1 ? citiesCount * 22 : 120);
-    
-    // Déterminer le profil géographique de la région
-    let reliefMaxEle = 120; // Bassin parisien plat
-    let baseCoords = { lat: 46.5, lng: 2.5 }; // Centre France
-    let roughness = 0.05; // Plaine
-    
+
+    // Déterminer le relief de la région pour les simulations d'altitudes
+    let reliefMaxEle = 120;
+    let roughness = 0.05;
     const reg = (gr.region || '').toLowerCase();
     if (reg.includes('alpes') || reg.includes('mercantour')) {
       reliefMaxEle = 2600;
-      baseCoords = { lat: 45.0, lng: 6.2 }; // Alpes
       roughness = 0.25;
     } else if (reg.includes('pyrénées')) {
       reliefMaxEle = 2400;
-      baseCoords = { lat: 42.8, lng: 0.5 }; // Pyrénées
       roughness = 0.22;
     } else if (reg.includes('corse')) {
       reliefMaxEle = 2100;
-      baseCoords = { lat: 42.1, lng: 9.1 }; // Corse
       roughness = 0.20;
     } else if (reg.includes('massif central') || reg.includes('auvergne') || reg.includes('cévennes')) {
       reliefMaxEle = 1400;
-      baseCoords = { lat: 45.2, lng: 3.0 }; // Auvergne
       roughness = 0.15;
     } else if (reg.includes('bretagne')) {
       reliefMaxEle = 320;
-      baseCoords = { lat: 48.2, lng: -3.0 }; // Bretagne
       roughness = 0.08;
     } else if (reg.includes('normandie')) {
       reliefMaxEle = 300;
-      baseCoords = { lat: 49.2, lng: -0.5 }; // Normandie
       roughness = 0.07;
     } else if (reg.includes('jura')) {
       reliefMaxEle = 1500;
-      baseCoords = { lat: 46.8, lng: 6.0 }; // Jura
       roughness = 0.18;
     } else if (reg.includes('vosges') || reg.includes('alsace')) {
       reliefMaxEle = 1200;
-      baseCoords = { lat: 48.0, lng: 7.0 }; // Vosges
       roughness = 0.14;
     } else if (reg.includes('provence') || reg.includes('var') || reg.includes('marseille')) {
       reliefMaxEle = 900;
-      baseCoords = { lat: 43.6, lng: 5.8 }; // Provence
       roughness = 0.12;
-    } else if (reg.includes('réunion')) {
-      reliefMaxEle = 2800;
-      baseCoords = { lat: -21.1, lng: 55.5 }; // La Réunion
-      roughness = 0.30;
-    } else if (reg.includes('guadeloupe')) {
-      reliefMaxEle = 1200;
-      baseCoords = { lat: 16.15, lng: -61.65 }; // Guadeloupe
-      roughness = 0.22;
-    } else if (reg.includes('martinique')) {
-      reliefMaxEle = 1100;
-      baseCoords = { lat: 14.65, lng: -61.0 }; // Martinique
-      roughness = 0.20;
     }
 
-    // Calculer les étapes
-    const numStages = Math.max(Math.ceil(dist / 22), 2);
-    const distPerStage = dist / numStages;
+    // Résoudre les coordonnées réelles des villes
+    const resolvedPoints = [];
+    cities.forEach(cityName => {
+      const match = CITIES_COORDINATES[cityName.toLowerCase()];
+      if (match) {
+        resolvedPoints.push({
+          name: cityName,
+          lat: match.lat,
+          lng: match.lng,
+          ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.4))
+        });
+      }
+    });
+
+    // Si on a moins de 2 points trouvés, on fait un tracé de repli centré sur la région
+    if (resolvedPoints.length < 2) {
+      let baseCoords = { lat: 46.5, lng: 2.5 };
+      if (reg.includes('alpes')) baseCoords = { lat: 45.0, lng: 6.2 };
+      else if (reg.includes('pyrénées')) baseCoords = { lat: 42.8, lng: 0.5 };
+      else if (reg.includes('corse')) baseCoords = { lat: 42.1, lng: 9.1 };
+      else if (reg.includes('bretagne')) baseCoords = { lat: 48.2, lng: -3.0 };
+      else if (reg.includes('normandie')) baseCoords = { lat: 49.2, lng: -0.5 };
+      else if (reg.includes('île-de-france') || reg.includes('paris')) baseCoords = { lat: 48.85, lng: 2.35 };
+
+      for (let i = 0; i < Math.max(citiesCount, 3); i++) {
+        const cityName = cities[i % citiesCount] || `Point ${i}`;
+        const angle = (i / Math.max(citiesCount, 3)) * Math.PI * 1.5;
+        const radius = 0.2 + (i * 0.05);
+        resolvedPoints.push({
+          name: cityName,
+          lat: baseCoords.lat + Math.sin(angle) * radius,
+          lng: baseCoords.lng + Math.cos(angle) * radius,
+          ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.3))
+        });
+      }
+    }
+
+    // Calculer la distance réelle cumulée entre les points géocodés
+    let realDist = 0;
+    for (let i = 0; i < resolvedPoints.length - 1; i++) {
+      const lat1 = resolvedPoints[i].lat * Math.PI / 180;
+      const lon1 = resolvedPoints[i].lng * Math.PI / 180;
+      const lat2 = resolvedPoints[i+1].lat * Math.PI / 180;
+      const lon2 = resolvedPoints[i+1].lng * Math.PI / 180;
+      const dlat = lat2 - lat1;
+      const dlon = lon2 - lon1;
+      const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      realDist += 6371 * c;
+    }
+
+    // Si le GR est circulaire (ex: Tour de Paris / boucle), on boucle le tracé
+    const isCircular = gr.name.toLowerCase().includes('tour') || gr.name.toLowerCase().includes('boucle');
+    if (isCircular && resolvedPoints.length > 2) {
+      // Connecter le dernier point au premier
+      resolvedPoints.push({
+        ...resolvedPoints[0],
+        name: resolvedPoints[0].name + " (Retour)"
+      });
+      // Rajouter la dernière liaison à la distance
+      const i = resolvedPoints.length - 2;
+      const lat1 = resolvedPoints[i].lat * Math.PI / 180;
+      const lon1 = resolvedPoints[i].lng * Math.PI / 180;
+      const lat2 = resolvedPoints[0].lat * Math.PI / 180;
+      const lon2 = resolvedPoints[0].lng * Math.PI / 180;
+      const dlat = lat2 - lat1;
+      const dlon = lon2 - lon1;
+      const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      realDist += 6371 * c;
+    }
+
+    const finalDistance = Math.round(gr.distanceKm || realDist || 120);
+    const numStages = Math.max(Math.ceil(finalDistance / 22), 2);
+    const distPerStage = finalDistance / numStages;
+
+    // Découper le tracé en étapes journalières basées sur les points géocodés
     const stages = [];
     let accumulatedDPlus = 0;
 
     for (let i = 1; i <= numStages; i++) {
-      const startCity = cities[(i - 1) % citiesCount] || `Départ Étape ${i}`;
-      const endCity = cities[i % citiesCount] || `Arrivée Étape ${i}`;
+      const ptIndexStart = Math.floor(((i - 1) / numStages) * (resolvedPoints.length - 1));
+      const ptIndexEnd = Math.floor((i / numStages) * (resolvedPoints.length - 1));
+      const startCity = resolvedPoints[ptIndexStart]?.name || "Départ";
+      const endCity = resolvedPoints[ptIndexEnd]?.name || "Arrivée";
       
-      // Simuler D+ cohérent selon la région
-      const stageDPlus = Math.round((0.65 + Math.random() * 0.7) * (reliefMaxEle / 3.5));
+      const stageDPlus = Math.round((0.55 + Math.random() * 0.7) * (reliefMaxEle / 3.0));
       accumulatedDPlus += stageDPlus;
 
-      // Estimer la vitesse moyenne selon le relief (4km/h à plat, moins en montagne)
-      const speed = 4 - (stageDPlus / 500);
-      const activeSpeed = Math.max(speed, 2.2);
+      const speed = 4.0 - (stageDPlus / 600);
+      const activeSpeed = Math.max(speed, 2.3);
       const rawHours = distPerStage / activeSpeed;
       const hours = Math.floor(rawHours);
       const minutes = Math.round((rawHours % 1) * 60);
@@ -118,38 +229,23 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
       });
     }
 
-    // Créer des waypoints cartographiques simulés décrivant une courbe dans la région
-    const waypoints = [];
-    for (let i = 0; i <= numStages; i++) {
-      const cityName = cities[i % citiesCount] || `Point intermédiaire ${i}`;
-      const angle = (i / numStages) * Math.PI * 1.5; // Décrit un arc de cercle
-      const radius = 0.3 + (i * 0.08); // Rayon progressif pour un tracé sinueux
-
-      waypoints.push({
-        name: cityName,
-        lat: baseCoords.lat + Math.sin(angle) * radius + (Math.random() - 0.5) * 0.04,
-        lng: baseCoords.lng + Math.cos(angle) * radius + (Math.random() - 0.5) * 0.04,
-        ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.6))
-      });
-    }
-
     return {
       ...gr,
-      distanceKm: Math.round(dist),
+      distanceKm: finalDistance,
       elevationGainM: accumulatedDPlus,
       recommendedDays: numStages,
       stages,
-      waypoints
+      waypoints: resolvedPoints
     };
   };
 
-  // Liste fusionnée
-  const currentCatalogList = activeCatalogTab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
+  // Liste fusionnée dynamique
+  const currentCatalogList = activeCatalogTab === 'famous' ? famousGrs : allGrs;
 
   const filteredGrs = currentCatalogList.filter(gr => 
     gr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gr.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gr.shortName.toLowerCase().includes(searchTerm.toLowerCase())
+    (gr.region || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (gr.shortName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSelectGr = (gr) => {
@@ -159,7 +255,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
 
   const handleTabChange = (tab) => {
     setActiveCatalogTab(tab);
-    const list = tab === 'famous' ? FAMOUS_GR_LIST : sortedAllGrList;
+    const list = tab === 'famous' ? famousGrs : allGrs;
     setSelectedGr(enrichSimpleGr(list[0]));
     setActiveViewMode('stages');
   };
