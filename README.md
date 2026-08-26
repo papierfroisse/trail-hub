@@ -106,11 +106,21 @@ trail-hub/
 │   └── main.jsx                     # Point d'entrée React
 ├── package.json
 ├── vite.config.js
+├── SOURCES.md                   # Répertoire complet des sources officielles
 └── README.md
 ```
 
 ---
 
-## 📄 Licence
+## 📚 Sources & Références Officielles
 
-Ce projet est sous licence MIT.
+Toutes les données d'itinéraires (GR®, Véloroutes, étapes, dénivelés, hébergements) sont documentées et adossées aux organismes officiels gestionnaires (FFRandonnée, Parcs Nationaux, IGN, EuroVelo).
+
+Consultez le fichier complet : **[SOURCES.md](./SOURCES.md)**.
+
+---
+
+## 📄 Licence & Propriété Intellectuelle
+
+- Ce projet est sous licence MIT.
+- Les appellations **GR®**, **GRP®**, **PR®** et les balisages associés sont des marques déposées de la **Fédération Française de la Randonnée Pédestre (FFRandonnée)**.

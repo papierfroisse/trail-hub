@@ -4,8 +4,82 @@ import { ALL_GR_CATALOG } from '../data/allGrCatalog';
 import { CITIES_COORDINATES } from '../data/citiesCoordinates';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download, Activity } from 'lucide-react';
+import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download, Activity, ExternalLink, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
+
+// ─── Fonctions pures extraites hors du composant ───────────────────
+function getClimbCategory(dPlus, distKm) {
+  const score = dPlus * (dPlus / (distKm * 1000 || 1));
+  if (dPlus > 800 || score > 40) return { label: 'Hors Catégorie (HC)', color: '#ef4444' };
+  if (dPlus > 500 || score > 25) return { label: '1ère Catégorie', color: '#f97316' };
+  if (dPlus > 300 || score > 15) return { label: '2ème Catégorie', color: '#eab308' };
+  if (dPlus > 180 || score > 8) return { label: '3ème Catégorie', color: '#3b82f6' };
+  return { label: '4ème Catégorie', color: '#10b981' };
+}
+
+function detectClimbs(waypoints) {
+  if (!waypoints || waypoints.length < 2) return [];
+  const climbs = [];
+  let currentClimb = null;
+  const pointsWithDist = [];
+  let totalDist = 0;
+  for (let i = 0; i < waypoints.length; i++) {
+    if (i > 0) {
+      const lat1 = waypoints[i-1].lat * Math.PI / 180;
+      const lon1 = waypoints[i-1].lng * Math.PI / 180;
+      const lat2 = waypoints[i].lat * Math.PI / 180;
+      const lon2 = waypoints[i].lng * Math.PI / 180;
+      const dlat = lat2 - lat1;
+      const dlon = lon2 - lon1;
+      const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      totalDist += 6371 * c;
+    }
+    pointsWithDist.push({ ...waypoints[i], dist: totalDist });
+  }
+  for (let i = 0; i < pointsWithDist.length - 1; i++) {
+    const p1 = pointsWithDist[i];
+    const p2 = pointsWithDist[i+1];
+    const eleDiff = p2.ele - p1.ele;
+    if (eleDiff > 5) {
+      if (!currentClimb) {
+        currentClimb = { startIndex: i, startName: p1.name, startEle: p1.ele, startDist: p1.dist, maxEle: p2.ele, endName: p2.name, endDist: p2.dist, dPlus: eleDiff };
+      } else {
+        currentClimb.maxEle = Math.max(currentClimb.maxEle, p2.ele);
+        currentClimb.endName = p2.name;
+        currentClimb.endDist = p2.dist;
+        currentClimb.dPlus += eleDiff;
+      }
+    } else if (eleDiff < -35) {
+      if (currentClimb) {
+        const climbDist = currentClimb.endDist - currentClimb.startDist;
+        const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
+        if (currentClimb.dPlus >= 120 && slope >= 2.0) {
+          climbs.push({ name: `${currentClimb.startName} ➔ ${currentClimb.endName}`, distanceKm: Math.round(climbDist * 10) / 10, dPlus: Math.round(currentClimb.dPlus), slopeAvg: Math.round(slope * 10) / 10, startEle: currentClimb.startEle, endEle: currentClimb.maxEle });
+        }
+        currentClimb = null;
+      }
+    }
+  }
+  if (currentClimb) {
+    const climbDist = currentClimb.endDist - currentClimb.startDist;
+    const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
+    if (currentClimb.dPlus >= 120 && slope >= 2.0) {
+      climbs.push({ name: `${currentClimb.startName} ➔ ${currentClimb.endName}`, distanceKm: Math.round(climbDist * 10) / 10, dPlus: Math.round(currentClimb.dPlus), slopeAvg: Math.round(slope * 10) / 10, startEle: currentClimb.startEle, endEle: currentClimb.maxEle });
+    }
+  }
+  return climbs;
+}
+
+// Générateur pseudo-aléatoire déterministe (évite Math.random pendant le render)
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
+// ────────────────────────────────────────────────────────────────────
 
 export default function GrCatalog({ onSelectGrForPlanner }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,8 +99,6 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
   const [famousGrs, setFamousGrs] = useState(FAMOUS_GR_LIST);
   const [allGrs, setAllGrs] = useState(sortedAllGrList);
   const [selectedGr, setSelectedGr] = useState(FAMOUS_GR_LIST[0]);
-  const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map' | 'profile'
-  const [loadingDb, setLoadingDb] = useState(false);
   const [hikerProfile, setHikerProfile] = useState('active'); // 'relaxed' | 'active' | 'runner' | 'ultra'
 
   // Charger les GR réels depuis Supabase si configuré
@@ -34,7 +106,6 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
     if (!isSupabaseConfigured) return;
 
     const fetchGrsFromDb = async () => {
-      setLoadingDb(true);
       try {
         const { data, error } = await supabase
           .from('gr_routes')
@@ -77,11 +148,12 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
       } catch (err) {
         console.error("Erreur lors de la récupération des GR Supabase:", err);
       } finally {
-        setLoadingDb(false);
+        // chargement terminé
       }
     };
 
     fetchGrsFromDb();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Générateur dynamique d'étapes et de coordonnées réelles à partir du dictionnaire de villes
@@ -95,36 +167,30 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
 
     // Déterminer le relief de la région pour les simulations d'altitudes
     let reliefMaxEle = 120;
-    let roughness = 0.05;
     const reg = (gr.region || '').toLowerCase();
     if (reg.includes('alpes') || reg.includes('mercantour')) {
       reliefMaxEle = 2600;
-      roughness = 0.25;
     } else if (reg.includes('pyrénées')) {
       reliefMaxEle = 2400;
-      roughness = 0.22;
     } else if (reg.includes('corse')) {
       reliefMaxEle = 2100;
-      roughness = 0.20;
     } else if (reg.includes('massif central') || reg.includes('auvergne') || reg.includes('cévennes')) {
       reliefMaxEle = 1400;
-      roughness = 0.15;
     } else if (reg.includes('bretagne')) {
       reliefMaxEle = 320;
-      roughness = 0.08;
     } else if (reg.includes('normandie')) {
       reliefMaxEle = 300;
-      roughness = 0.07;
     } else if (reg.includes('jura')) {
       reliefMaxEle = 1500;
-      roughness = 0.18;
     } else if (reg.includes('vosges') || reg.includes('alsace')) {
       reliefMaxEle = 1200;
-      roughness = 0.14;
     } else if (reg.includes('provence') || reg.includes('var') || reg.includes('marseille')) {
       reliefMaxEle = 900;
-      roughness = 0.12;
     }
+
+    // Pseudo-random déterministe basé sur le nom du GR (stable entre re-renders)
+    const seed = (gr.id || gr.name || '').split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    const rand = seededRandom(seed);
 
     // Résoudre les coordonnées réelles des villes
     const resolvedPoints = [];
@@ -135,7 +201,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
           name: cityName,
           lat: match.lat,
           lng: match.lng,
-          ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.4))
+          ele: Math.round(80 + rand() * (reliefMaxEle * 0.4))
         });
       }
     });
@@ -158,7 +224,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
           name: cityName,
           lat: baseCoords.lat + Math.sin(angle) * radius,
           lng: baseCoords.lng + Math.cos(angle) * radius,
-          ele: Math.round(80 + Math.random() * (reliefMaxEle * 0.3))
+          ele: Math.round(80 + rand() * (reliefMaxEle * 0.3))
         });
       }
     }
@@ -212,7 +278,7 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
       const startCity = resolvedPoints[ptIndexStart]?.name || "Départ";
       const endCity = resolvedPoints[ptIndexEnd]?.name || "Arrivée";
       
-      const stageDPlus = Math.round((0.55 + Math.random() * 0.7) * (reliefMaxEle / 3.0));
+      const stageDPlus = Math.round((0.55 + rand() * 0.7) * (reliefMaxEle / 3.0));
       accumulatedDPlus += stageDPlus;
 
       const speed = 4.0 - (stageDPlus / 600);
@@ -341,107 +407,6 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
-
-  const getClimbCategory = (dPlus, distKm) => {
-    const score = dPlus * (dPlus / (distKm * 1000 || 1));
-    if (dPlus > 800 || score > 40) return { label: 'Hors Catégorie (HC)', color: '#ef4444' };
-    if (dPlus > 500 || score > 25) return { label: '1ère Catégorie', color: '#f97316' };
-    if (dPlus > 300 || score > 15) return { label: '2ème Catégorie', color: '#eab308' };
-    if (dPlus > 180 || score > 8) return { label: '3ème Catégorie', color: '#3b82f6' };
-    return { label: '4ème Catégorie', color: '#10b981' };
-  };
-
-  const detectClimbs = (waypoints) => {
-    if (!waypoints || waypoints.length < 2) return [];
-    
-    const climbs = [];
-    let currentClimb = null;
-    
-    // Calculer la distance cumulée entre les points
-    const pointsWithDist = [];
-    let totalDist = 0;
-    
-    for (let i = 0; i < waypoints.length; i++) {
-      if (i > 0) {
-        const lat1 = waypoints[i-1].lat * Math.PI / 180;
-        const lon1 = waypoints[i-1].lng * Math.PI / 180;
-        const lat2 = waypoints[i].lat * Math.PI / 180;
-        const lon2 = waypoints[i].lng * Math.PI / 180;
-        const dlat = lat2 - lat1;
-        const dlon = lon2 - lon1;
-        const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        totalDist += 6371 * c;
-      }
-      pointsWithDist.push({
-        ...waypoints[i],
-        dist: totalDist
-      });
-    }
-
-    // Parcourir les points pour détecter les segments ascendants
-    for (let i = 0; i < pointsWithDist.length - 1; i++) {
-      const p1 = pointsWithDist[i];
-      const p2 = pointsWithDist[i+1];
-      const eleDiff = p2.ele - p1.ele;
-      const distDiff = p2.dist - p1.dist;
-      
-      if (eleDiff > 5) { // Ça monte
-        if (!currentClimb) {
-          currentClimb = {
-            startIndex: i,
-            startName: p1.name,
-            startEle: p1.ele,
-            startDist: p1.dist,
-            maxEle: p2.ele,
-            endName: p2.name,
-            endDist: p2.dist,
-            dPlus: eleDiff
-          };
-        } else {
-          currentClimb.maxEle = Math.max(currentClimb.maxEle, p2.ele);
-          currentClimb.endName = p2.name;
-          currentClimb.endDist = p2.dist;
-          currentClimb.dPlus += eleDiff;
-        }
-      } else if (eleDiff < -35) { // Ça descend de façon significative, on clôture la montée en cours
-        if (currentClimb) {
-          const climbDist = currentClimb.endDist - currentClimb.startDist;
-          const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
-          
-          if (currentClimb.dPlus >= 120 && slope >= 2.0) {
-            climbs.push({
-              name: `${currentClimb.startName} ➔ ${currentClimb.endName}`,
-              distanceKm: Math.round(climbDist * 10) / 10,
-              dPlus: Math.round(currentClimb.dPlus),
-              slopeAvg: Math.round(slope * 10) / 10,
-              startEle: currentClimb.startEle,
-              endEle: currentClimb.maxEle
-            });
-          }
-          currentClimb = null;
-        }
-      }
-    }
-    
-    // Si une montée est encore active à la fin
-    if (currentClimb) {
-      const climbDist = currentClimb.endDist - currentClimb.startDist;
-      const slope = climbDist > 0.1 ? (currentClimb.dPlus / (climbDist * 1000)) * 100 : 0;
-      if (currentClimb.dPlus >= 120 && slope >= 2.0) {
-        climbs.push({
-          name: `${currentClimb.startName} ➔ ${currentClimb.endName}`,
-          distanceKm: Math.round(climbDist * 10) / 10,
-          dPlus: Math.round(currentClimb.dPlus),
-          slopeAvg: Math.round(slope * 10) / 10,
-          startEle: currentClimb.startEle,
-          endEle: currentClimb.maxEle
-        });
-      }
-    }
-    
-    return climbs;
   };
 
   return (
@@ -674,43 +639,83 @@ export default function GrCatalog({ onSelectGrForPlanner }) {
               </p>
             </div>
 
-            {/* Volet de liaison GPS / Montre */}
+            {/* Volet officiel FFRandonnée & Synchronisation GPS */}
             {hasWaypoints && (
               <div style={{
-                background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(15, 23, 42, 0.4))',
-                padding: '1.25rem',
-                borderRadius: '12px',
-                border: '1px solid rgba(249, 115, 22, 0.15)',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.5))',
+                padding: '1.5rem',
+                borderRadius: '14px',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '1.5rem',
                 flexWrap: 'wrap'
               }}>
-                <div style={{ flex: 1, minWidth: '200px' }}>
-                  <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '0.4rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Activity size={16} color="#fc5200" />
-                    Synchroniser sur votre Montre / GPS
+                <div style={{ flex: 1, minWidth: '240px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <span className="badge badge-emerald">
+                      <ShieldCheck size={13} /> Source Officielle Certifiée
+                    </span>
+                  </div>
+                  <h4 style={{ color: '#fff', fontWeight: 800, marginBottom: '0.4rem', fontSize: '1.05rem' }}>
+                    Documentation Homologuée & Export Montre
                   </h4>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5, margin: 0 }}>
-                    Scannez ce QR Code avec votre téléphone pour ouvrir le tracé officiel dans votre application <strong>Strava</strong>. Vous pourrez ensuite le synchroniser directement sur votre montre en 1 clic !
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.5, margin: '0 0 1rem 0' }}>
+                    Scannez ce QR Code avec votre téléphone pour ouvrir le portail officiel de référence du sentier ou téléchargez le fichier GPX pour l'importer directement dans votre montre (Garmin, Suunto, Coros, Strava).
                   </p>
+                  
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <a
+                      href={selectedGr.officialUrl || "https://www.ffrandonnee.fr/"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-sm"
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: 'var(--emerald-green)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      <ExternalLink size={15} />
+                      <span>Portail Officiel du Sentier</span>
+                    </a>
+                    
+                    <button
+                      onClick={() => downloadGpx(selectedGr)}
+                      className="btn btn-sm btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                    >
+                      <Download size={15} />
+                      <span>Télécharger GPX Montre</span>
+                    </button>
+                  </div>
                 </div>
+
                 <div style={{
                   background: '#fff',
-                  padding: '0.5rem',
-                  borderRadius: '8px',
+                  padding: '0.6rem',
+                  borderRadius: '10px',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                  gap: '0.35rem',
+                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
+                  border: '2px solid rgba(16, 185, 129, 0.3)'
                 }}>
                   <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(selectedGr.stravaRouteUrl || `https://www.strava.com/routes/explore?query=${selectedGr.shortName}`)}`} 
-                    alt="QR Code de synchronisation montre"
-                    style={{ width: '100px', height: '100px' }}
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(selectedGr.officialUrl || "https://www.ffrandonnee.fr/")}`} 
+                    alt="QR Code officiel du sentier"
+                    style={{ width: '110px', height: '110px' }}
                   />
+                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Site Officiel
+                  </span>
                 </div>
               </div>
             )}

@@ -15,7 +15,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert",
     color: "#ef4444",
     description: "Le sentier de grande randonnée le plus dur d'Europe. Traversée nord-sud de la Corse par les crêtes granitiques, de Calenzana à Conca.",
-    stravaRouteUrl: "https://www.strava.com/routes/31518420",
+    officialUrl: "https://www.le-gr20.fr/",
     startLocation: "Calenzana",
     endLocation: "Conca",
     waypoints: [
@@ -70,7 +70,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#3b82f6",
     description: "Le tour du massif du Mont-Blanc à travers 3 pays. Glaciers, cols alpins, vallées verdoyantes. L'un des plus beaux treks d'Europe.",
-    stravaRouteUrl: "https://www.strava.com/routes/28639201",
+    officialUrl: "https://www.autourdumontblanc.com/",
     startLocation: "Les Houches",
     endLocation: "Les Houches (boucle)",
     waypoints: [
@@ -113,6 +113,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert (engagement, longueur)",
     color: "#f59e0b",
     description: "Traversée intégrale des Pyrénées françaises, d'Hendaye (Atlantique) à Banyuls-sur-Mer (Méditerranée). L'un des plus longs GR de France.",
+    officialUrl: "https://www.gr10.org/",
     startLocation: "Hendaye",
     endLocation: "Banyuls-sur-Mer",
     waypoints: [
@@ -193,6 +194,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Modéré (longueur)",
     color: "#0ea5e9",
     description: "Le plus long GR de France. Tour complet de la côte bretonne du Mont-Saint-Michel au pont de Saint-Nazaire. Falaises, plages, ports, phares et landes.",
+    officialUrl: "https://bretagne.ffrandonnee.fr/",
     startLocation: "Mont-Saint-Michel",
     endLocation: "Saint-Nazaire",
     waypoints: [
@@ -242,6 +244,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Modéré",
     color: "#a855f7",
     description: "Le chemin de Saint-Jacques-de-Compostelle le plus emprunté en France. Du Puy-en-Velay à Saint-Jean-Pied-de-Port, à travers l'Aubrac, la vallée du Lot, le Quercy et le Pays Basque.",
+    officialUrl: "https://www.chemins-compostelle.com/",
     startLocation: "Le Puy-en-Velay",
     endLocation: "Saint-Jean-Pied-de-Port",
     waypoints: [
@@ -303,6 +306,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert",
     color: "#10b981",
     description: "Le GR le plus sauvage et le plus rude des Alpes françaises. Tour du massif des Écrins par des cols à plus de 2700m et des vallées isolées au pied des glaciers.",
+    officialUrl: "https://www.grand-tour-ecrins.fr/",
     startLocation: "Bourg d'Oisans",
     endLocation: "Bourg d'Oisans (boucle)",
     waypoints: [
@@ -343,6 +347,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#8b5cf6",
     description: "Traversée intégrale des Alpes françaises du Lac Léman à la Méditerranée par les plus beaux massifs : Chablais, Beaufortain, Vanoise, Cerces, Queyras, Ubaye, Mercantour.",
+    officialUrl: "https://www.grande-traversee-alpes.com/",
     startLocation: "Saint-Gingolph (Lac Léman)",
     endLocation: "Nice",
     waypoints: [
@@ -407,6 +412,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Modéré",
     color: "#ec4899",
     description: "Sur les traces de l'écrivain Robert Louis Stevenson et de son ânesse Modestine (1878). Du Velay aux Cévennes en passant par le Gévaudan, le Mont Lozère et les vallées cévenoles.",
+    officialUrl: "https://www.chemin-stevenson.org/",
     startLocation: "Le Puy-en-Velay",
     endLocation: "Saint-Jean-du-Gard",
     waypoints: [
@@ -453,6 +459,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Facile à Modéré",
     color: "#06b6d4",
     description: "Le sentier des falaises de craie de Normandie. Du Havre au Tréport le long des falaises d'Albâtre, passant par Étretat, Fécamp, Dieppe et ses valleuses.",
+    officialUrl: "https://normandie.ffrandonnee.fr/",
     startLocation: "Le Havre",
     endLocation: "Le Tréport",
     waypoints: [
@@ -490,6 +497,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Modéré",
     color: "#84cc16",
     description: "Boucle autour du plus grand stratovolcan d'Europe. Paysages volcaniques spectaculaires : Puy Mary, Plomb du Cantal, vallées glaciaires (cirques) et estives.",
+    officialUrl: "https://www.cantal-destination.com/",
     startLocation: "Aurillac ou Murat",
     endLocation: "Aurillac ou Murat (boucle)",
     waypoints: [
@@ -529,6 +537,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert (très alpin)",
     color: "#f43f5e",
     description: "L'un des GR les plus alpins et techniques de France. Traversée en altitude de la chaîne de Belledonne entre lacs et arêtes rocheuses, face au massif des Écrins.",
+    officialUrl: "https://hautetraverseedebelledonne.com/",
     startLocation: "Aiguebelle (Maurienne)",
     endLocation: "Vizille (près de Grenoble)",
     waypoints: [
@@ -565,6 +574,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#14b8a6",
     description: "Traversée du Parc National du Mercantour par les crêtes et la Vallée des Merveilles. Lacs d'altitude, bouquetins, gravures rupestres de l'Âge du Bronze.",
+    officialUrl: "https://www.mercantour-parcnational.fr/",
     startLocation: "Saint-Dalmas-Valdeblore",
     endLocation: "Menton",
     waypoints: [
@@ -600,6 +610,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#d946ef",
     description: "Tour du Parc Naturel Régional du Queyras par les cols d'altitude (2400-2900m). Vallées préservées, villages de montagne authentiques (Saint-Véran le plus haut d'Europe), cadrans solaires et nature sauvage.",
+    officialUrl: "https://www.montourduqueyras.fr/",
     startLocation: "Ceillac",
     endLocation: "Ceillac (boucle)",
     waypoints: [
@@ -638,6 +649,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#6366f1",
     description: "Le Tour de l'Île-de-France ou la grande boucle historique de randonnée d'Île-de-France. Traverse des parcs naturels forestiers et des domaines de châteaux d'exception tout autour de Paris.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Paris Porte Maillot",
     endLocation: "Porte Maillot (boucle)",
     waypoints: [
@@ -679,6 +691,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#8b5cf6",
     description: "Le sentier qui suit la Seine depuis sa source sauvage en Côte d'Or près de Dijon, jusqu'à son embouchure à l'Océan au Havre.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Dijon",
     endLocation: "Le Havre",
     waypoints: [
@@ -726,6 +739,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Difficile",
     color: "#06b6d4",
     description: "Le tout premier GR historique balisé de France. Il suit le cours de la Loire sauvage, depuis sa source au mont Gerbier-de-Jonc jusqu'à son embouchure à l'Océan à La Baule.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Mont Gerbier-de-Jonc",
     endLocation: "La Baule",
     waypoints: [
@@ -775,6 +789,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert",
     color: "#f59e0b",
     description: "Une diagonale reliant l'océan Atlantique à Royan aux reliefs ensoleillés de Grasse en Provence, à travers volcans d'Auvergne, gorges de l'Ardèche et du Verdon.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Royan",
     endLocation: "Grasse",
     waypoints: [
@@ -818,6 +833,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Expert",
     color: "#ec4899",
     description: "Une immense traversée d'est en ouest reliant Saint-Paul-sur-Ubaye dans les Alpes de Haute-Provence à Arcachon face à l'océan Atlantique. Il traverse le Luberon, le Pont du Gard, le Mont Aigoual et le Périgord.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Saint-Paul-sur-Ubaye",
     endLocation: "Arcachon",
     waypoints: [
@@ -841,7 +857,7 @@ export const FAMOUS_GR_LIST = [
       { number: 3, name: "Gordes ➔ Tarascon", distanceKm: 58, dPlus: 850, dMinus: 1200, timeEst: "14h30" },
       { number: 4, name: "Tarascon ➔ Pont du Gard", distanceKm: 28, dPlus: 320, dMinus: 280, timeEst: "7h00" },
       { number: 5, name: "Pont du Gard ➔ Anduze", distanceKm: 65, dPlus: 1200, dMinus: 1120, timeEst: "17h00" },
-      { number: 6, name: "Anduze ➔ Sommet du Mont Aigoual", distanceKm: 52, dPlus: 2100, dPlus: 680, timeEst: "14h00" },
+      { number: 6, name: "Anduze ➔ Sommet du Mont Aigoual", distanceKm: 52, dPlus: 2100, dMinus: 680, timeEst: "14h00" },
       { number: 7, name: "Mont Aigoual ➔ Conques", distanceKm: 180, dPlus: 4500, dMinus: 5780, timeEst: "48h00" },
       { number: 8, name: "Conques ➔ Figeac", distanceKm: 45, dPlus: 1100, dMinus: 1160, timeEst: "11h30" },
       { number: 9, name: "Figeac ➔ Rocamadour", distanceKm: 52, dPlus: 980, dMinus: 910, timeEst: "13h00" },
@@ -863,6 +879,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Difficile",
     color: "#10b981",
     description: "La grande portion emblématique du GR 7 traversant le Massif central par ses parcs naturels d'exception (Pilat, Monts d'Ardèche, Cévennes, Haut-Languedoc). Suit la ligne de partage des eaux de Mâcon à Castelnaudary.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Mâcon",
     endLocation: "Castelnaudary",
     waypoints: [
@@ -896,6 +913,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#0ea5e9",
     description: "Le magnifique sentier littoral atlantique reliant Saint-Brevin-les-Pins à la frontière espagnole à Sare au Pays Basque. Randonnez entre forêts de pins landaises, dunes, plages sauvages et contreforts pyrénéens.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Saint-Brevin-les-Pins",
     endLocation: "Sare",
     waypoints: [
@@ -936,6 +954,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#f59e0b",
     description: "Une exceptionnelle traversée du nord au sud, reliant Saint-Amour dans le Jura à Port-Grimaud au bord du golfe de Saint-Tropez. Un sentier montagnard sauvage traversant la Chartreuse, le Vercors, le Ventoux et le Luberon.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Saint-Amour",
     endLocation: "Port-Grimaud",
     waypoints: [
@@ -974,6 +993,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#6366f1",
     description: "La boucle externe historique de l'Île-de-France. Ce sentier forestier traverse le Val-d'Oise, l'Oise, la Seine-et-Marne et les Yvelines, offrant une immersion profonde dans les forêts de Chantilly, Fontainebleau et de Rambouillet.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Paris Porte de Saint-Cloud",
     endLocation: "Porte de Saint-Cloud (boucle)",
     waypoints: [
@@ -1014,6 +1034,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#8b5cf6",
     description: "La portion française du grand sentier européen GR 12. Il pénètre en France par le plateau fortifié de Rocroi dans les Ardennes, traverse l'Aisne, l'Oise, les forêts royales de Compiègne et Chantilly et rejoint Paris.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Gué-d'Hossus",
     endLocation: "Paris (Notre-Dame)",
     waypoints: [
@@ -1051,6 +1072,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#06b6d4",
     description: "Une superbe transition reliant la forêt de Fontainebleau aux contreforts granitiques et sauvages du massif du Morvan. Traverse le Gâtinais, l'Yonne et se termine à la station thermale de Bourbon-Lancy.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Fontainebleau",
     endLocation: "Bourbon-Lancy",
     waypoints: [
@@ -1096,6 +1118,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#ec4899",
     description: "Une magnifique traversée reliant l'est de Paris aux forêts denses et vallonnées des Ardennes. Traverse la Brie, le vignoble champenois, l'Argonne sauvage et se termine à Sedan face à la frontière belge.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Paris Porte de Vincennes",
     endLocation: "Sedan",
     waypoints: [
@@ -1129,6 +1152,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Moyen",
     color: "#8b5cf6",
     description: "Le tout nouveau GR francilien (inauguré en 2025). Il suit fidèlement les méandres de la Marne de sa confluence à Paris (Maisons-Alfort) jusqu'à Château-Thierry, conçu pour être parcouru de gare en gare.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Maisons-Alfort",
     endLocation: "Château-Thierry",
     waypoints: [
@@ -1171,6 +1195,7 @@ export const FAMOUS_GR_LIST = [
     difficulty: "Soutenu",
     color: "#f59e0b",
     description: "Le superbe sentier forestier qui suit les courbes serrées de la rivière de la Semois depuis sa source à Arlon en Belgique jusqu'à son embouchure sauvage dans la Meuse à Monthermé en France.",
+    officialUrl: "https://www.ffrandonnee.fr/",
     startLocation: "Arlon (Belgique)",
     endLocation: "Monthermé",
     waypoints: [

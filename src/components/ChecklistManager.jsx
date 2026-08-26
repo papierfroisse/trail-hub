@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Backpack, CheckSquare, Square, Scale, Plus, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Backpack, CheckSquare, Square, Scale, ArrowLeft } from 'lucide-react';
 
 export default function ChecklistManager({ trail, equipmentList, onBack }) {
   const [items, setItems] = useState(() => {

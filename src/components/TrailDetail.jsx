@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
 import RaceStrategyCalculator from './RaceStrategyCalculator';
-import { ArrowLeft, MapPin, Mountain, Calendar, CheckCircle2, Download, Backpack, Layers, Calculator } from 'lucide-react';
+import { ArrowLeft, MapPin, Mountain, Calendar, Download, Backpack, Layers } from 'lucide-react';
 import { generateGPXString } from '../utils/gpxParser';
 
 export default function TrailDetail({ trail, onBack, onOpenChecklist }) {

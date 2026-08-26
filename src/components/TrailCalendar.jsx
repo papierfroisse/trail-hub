@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Mountain, Navigation, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 export default function TrailCalendar({ trails, onSelectTrail }) {
   const [currentDate, setCurrentDate] = useState(new Date());

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Backpack, Plus, Trash2, Scale, Tag, Info, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Backpack, Plus, Trash2, Scale, Tag } from 'lucide-react';
 
 export default function EquipmentManager({ equipmentList, onSaveEquipment }) {
   const [activeCategory, setActiveCategory] = useState('ALL');

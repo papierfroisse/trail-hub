@@ -1,6 +1,6 @@
 import React from 'react';
 import { exportAllDataJSON, importAllDataJSON } from '../utils/storage';
-import { Download, Upload, RefreshCw, X, ShieldCheck } from 'lucide-react';
+import { Download, Upload, X, ShieldCheck } from 'lucide-react';
 
 export default function SettingsModal({ isOpen, onClose, onReloadData }) {
   if (!isOpen) return null;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { calculateKmEffort, estimateDuration, calculateNutritionNeeds } from '../utils/trailCalculators';
-import { Timer, Droplets, Zap, Flame, Scale, Mountain, ArrowRight, Activity, Calculator, CheckCircle2 } from 'lucide-react';
+import { Timer, Droplets, Zap, Activity, Calculator } from 'lucide-react';
 
 export default function RaceStrategyCalculator({ trail }) {
   const [flatPaceMinPerKm, setFlatPaceMinPerKm] = useState(6.0); // 6:00 min/km = 10 km/h

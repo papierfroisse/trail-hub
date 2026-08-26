@@ -46,6 +46,10 @@ export default function Dashboard({ trails, equipmentList, onNavigateTab, onSele
               <MapPin size={18} />
               <span>Mes Trails & GPX</span>
             </button>
+            <button onClick={() => onNavigateTab('equipment')} className="btn btn-secondary">
+              <Backpack size={18} />
+              <span>Mon Équipement ({equipmentList?.length || 0})</span>
+            </button>
           </div>
         </div>
       </div>

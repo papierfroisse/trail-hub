@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { BIKE_ROUTES_LIST } from '../data/bikeRoutesData';
 import GpxMap from './GpxMap';
-import { Navigation, MapPin, Compass, Shield, Clock, Layers, PlusCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Navigation, MapPin, Compass, Clock, Layers, PlusCircle, AlertCircle, Mountain } from 'lucide-react';
 
 export default function BikeCatalog({ onSaveAsPersonalTrail }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoute, setSelectedRoute] = useState(BIKE_ROUTES_LIST[0]);
-  const [activeViewMode, setActiveViewMode] = useState('stages'); // 'stages' | 'map'
   
   // Filtres POI pour la carte
   const [showToilets, setShowToilets] = useState(true);

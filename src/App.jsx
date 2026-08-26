@@ -12,7 +12,7 @@ import SettingsModal from './components/SettingsModal';
 import Auth from './components/Auth';
 
 import { ToastProvider, useToast } from './context/ToastContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { TrailProvider, useTrails } from './context/TrailContext';
 import { GearProvider, useGear } from './context/GearContext';
 import { StravaProvider } from './context/StravaContext';

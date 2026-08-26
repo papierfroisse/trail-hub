@@ -65,7 +65,6 @@ export default function Navbar({ activeTab, setActiveTab, onOpenSettings, onOpen
                   gap: '0.5rem',
                   padding: '0.6rem 1.1rem',
                   borderRadius: '10px',
-                  border: 'none',
                   background: isActive ? 'rgba(249, 115, 22, 0.15)' : 'transparent',
                   color: isActive ? 'var(--primary-orange)' : 'var(--text-muted)',
                   border: isActive ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid transparent',

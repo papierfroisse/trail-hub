@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { parseGPX } from '../utils/gpxParser';
 import TrailCalendar from './TrailCalendar';
-import { MapPin, Plus, Upload, Trash2, Calendar, Mountain, Navigation, CheckCircle2, Clock, FileText, ChevronRight, Grid, Calendar as CalendarIcon } from 'lucide-react';
+import { MapPin, Plus, Upload, Trash2, Calendar, ChevronRight, Grid } from 'lucide-react';
 
 export default function TrailList({ trails, onSaveTrail, onDeleteTrail, onSelectTrail }) {
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL' | 'À venir' | 'Terminé' | 'Wishlist'
@@ -128,7 +128,7 @@ export default function TrailList({ trails, onSaveTrail, onDeleteTrail, onSelect
               }}
               title="Vue Calendrier"
             >
-              <CalendarIcon size={15} />
+              <Calendar size={15} />
               <span>Calendrier</span>
             </button>
           </div>

@@ -3,7 +3,7 @@ import { FAMOUS_GR_LIST } from '../data/grData';
 import { generateGPXString } from '../utils/gpxParser';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Route, Plus, Trash2, ArrowUp, ArrowDown, Download, Save, MapPin, Mountain, Calendar, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Route, Plus, Trash2, ArrowUp, ArrowDown, Download, Save, MapPin, Mountain, Calendar, Layers, Sparkles } from 'lucide-react';
 
 export default function MultiGrPlanner({ preselectedGr, onSaveAsPersonalTrail }) {
   const [plannerName, setPlannerName] = useState('Mon Aventure Multi-GR');
@@ -72,7 +72,7 @@ export default function MultiGrPlanner({ preselectedGr, onSaveAsPersonalTrail })
   // Calculs totaux
   const totalDist = Math.round(selectedStages.reduce((sum, s) => sum + s.distanceKm, 0) * 10) / 10;
   const totalDPlus = selectedStages.reduce((sum, s) => sum + s.dPlus, 0);
-  const totalDMinus = selectedStages.reduce((sum, s) => sum + s.dMinus, 0);
+  const totalDMinus = selectedStages.reduce((sum, s) => sum + (s.dMinus || 0), 0);
   const totalDays = selectedStages.length;
 
   // Extraire les waypoints pour la carte interactive à partir des GR sélectionnés
@@ -332,7 +332,7 @@ export default function MultiGrPlanner({ preselectedGr, onSaveAsPersonalTrail })
                   <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem' }}>
                     <div><strong style={{ color: '#fff' }}>{stage.distanceKm}</strong> km</div>
                     <div><strong style={{ color: 'var(--emerald-green)' }}>+{stage.dPlus}m</strong></div>
-                    <div><strong style={{ color: 'var(--red-accent)' }}>-{stage.dMinus}m</strong></div>
+                    <div><strong style={{ color: 'var(--red-accent)' }}>-{stage.dMinus || 0}m</strong></div>
                   </div>
 
                   {/* Move & Delete Controls */}

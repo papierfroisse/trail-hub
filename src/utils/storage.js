@@ -95,7 +95,7 @@ export function importAllDataJSON(jsonText) {
     if (data.customGrPlans) saveCustomGrPlans(data.customGrPlans);
     if (data.equipment) saveEquipmentList(data.equipment);
     return { success: true, message: "Données importées avec succès !" };
-  } catch (e) {
+  } catch {
     return { success: false, message: "Fichier JSON invalide." };
   }
 }
