@@ -66,16 +66,32 @@ Ce document recense l'ensemble des institutions officielles, fédérations sport
 
 ---
 
-## 🗺️ 4. Données Géographiques & Cartographie
+## 🏔️ 4. Sources Officielles — Grands Sommets & Refuges d'Alpinisme (FFCAM & CAI)
 
-1. **Topoguides FFRandonnée** : Référence pour les dénominations d'étapes, dénivelés cumulés et altitudes des cols.
+| Sommet | Voie Normale / Cotation | Organisme / Refuge de Départ | Lien Officiel |
+|---|---|---|---|
+| **Mont Blanc (4808m)** | Voie Royale du Goûter (PD-) | FFCAM & Refuge du Goûter (3835m) | [refugedugouter.ffcam.fr](https://refugedugouter.ffcam.fr/) |
+| **Dôme des Écrins (4015m)** | Glacier Blanc (F+) | Parc National des Écrins & Refuge des Écrins (3175m) | [refugedesecrins.ffcam.fr](https://refugedesecrins.ffcam.fr/) |
+| **Grand Paradis (4061m)** | Schiena d'Asino (F+) | Parc National du Grand Paradis & Refuge Victor-Emmanuel II (2735m) | [rifugiovittorioemanuele.com](https://www.rifugiovittorioemanuele.com/) |
+| **Barre des Écrins (4102m)** | Arête Ouest (PD+/AD-) | FFCAM & Refuge des Écrins | [ecrins-parcnational.fr](https://www.ecrins-parcnational.fr/) |
+| **Mont Rose / Gnifetti (4554m)** | Cabane Marguerite (F/PD-) | CAI & Capanna Regina Margherita (4554m) | [rifugimonterosa.it](https://www.rifugimonterosa.it/) |
+| **Mont Viso (3841m)** | Voie Normale Sud (PD) | CAI & Rifugio Quintino Sella (2640m) | [rifugiosella.it](https://www.rifugiosella.it/) |
+| **Aiguille du Tour (3540m)** | Glacier du Tour (F+) | FFCAM & Refuge Albert 1er (2702m) | [refugealbert1er.ffcam.fr](https://refugealbert1er.ffcam.fr/) |
+| **Roche Faurio (3730m)** | Glacier Blanc (F) | FFCAM & Refuge des Écrins | [ecrins-parcnational.fr](https://www.ecrins-parcnational.fr/) |
+| **Vignemale (3298m)** | Glacier d'Ossoue (F+) | Parc National des Pyrénées & Refuge de Bayssellance (2651m) | [refugedebayssellance.ffcam.fr](https://refugedebayssellance.ffcam.fr/) |
+
+---
+
+## 🗺️ 5. Données Géographiques & Cartographie
+
+1. **Topoguides FFRandonnée, FFCAM & CAI** : Référence pour les dénominations d'étapes, dénivelés cumulés et altitudes des cols.
 2. **OpenStreetMap (OSM)** : Couche de fond cartographique via Leaflet.js, sous licence libre *Open Database License (ODbL)*.
 3. **OpenTopoMap & CartoDB** : Tuiles altimétriques et d'ombrage du relief.
 4. **Calculateur Altimétrique Intégré (Haversine & Dénivelés)** : Algorithmes mathématiques embarqués pour le lissage des profils et le calcul du kilomètre-effort (règle de Naismith / formule trail).
 
 ---
 
-## ⚖️ 5. Propriété Intellectuelle & Mentions Légales
+## ⚖️ 6. Propriété Intellectuelle & Mentions Légales
 
 * Les appellations **GR®**, **GRP®**, **PR®**, ainsi que les balisages blanc/rouge et jaune/rouge sont des **marques déposées par la Fédération Française de la Randonnée Pédestre (FFRandonnée)**.
 * L'application **Trail Hub** est un outil indépendant destiné à la planification sportive, à la préparation logistique personnelle et à l'analyse de données d'entraînement.

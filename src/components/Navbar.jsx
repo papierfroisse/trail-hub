@@ -13,7 +13,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenSettings, onOpen
   const navItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { id: 'gr-catalog', label: 'Les Grands GR', icon: Compass },
-    { id: 'bike-routes', label: 'Véloroutes & Voies Vertes', icon: Route },
+    { id: 'summits', label: 'Sommets & Refuges', icon: Mountain },
+    { id: 'bike-routes', label: 'Véloroutes', icon: Route },
     { id: 'multi-gr-planner', label: 'Planificateur Multi-GR', icon: Route },
     { id: 'trails', label: 'Mes Trails & GPX', icon: MapPin },
     { id: 'equipment', label: 'Équipement & Sac', icon: Backpack },

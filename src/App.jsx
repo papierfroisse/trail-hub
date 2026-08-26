@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import GrCatalog from './components/GrCatalog';
+import SummitsCatalog from './components/SummitsCatalog';
 import BikeCatalog from './components/BikeCatalog';
 import MultiGrPlanner from './components/MultiGrPlanner';
 import TrailList from './components/TrailList';
@@ -109,6 +110,12 @@ function MainAppContent() {
         {activeTab === 'gr-catalog' && (
           <GrCatalog 
             onSelectGrForPlanner={handleSelectGrForPlanner}
+          />
+        )}
+
+        {activeTab === 'summits' && (
+          <SummitsCatalog 
+            onAddTrail={handleSaveTrail}
           />
         )}
 
