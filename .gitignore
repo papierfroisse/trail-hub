@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Secrets et fichiers d'environnement (ne jamais committer)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+serviceaccount*.json
+.npmrc
+.pypirc
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
