@@ -3,15 +3,12 @@ import {
   Mountain, 
   MapPin, 
   Compass, 
-  Flag, 
   ShieldCheck, 
   Download, 
   ExternalLink, 
   Search, 
   Clock, 
   Plus, 
-  ChevronRight, 
-  CheckCircle2, 
   Home, 
   Calendar,
   AlertTriangle
@@ -22,7 +19,7 @@ import { ALPS_SUMMITS_LIST } from '../data/summitsData';
 import { useToast } from '../context/ToastContext';
 
 // Helper de génération de profil d'altitude interpolé
-function generateSummitElevationProfile(waypoints, totalGain) {
+function generateSummitElevationProfile(waypoints, _totalGain) {
   if (!waypoints || waypoints.length === 0) return [];
   const profile = [];
   let currentDist = 0;

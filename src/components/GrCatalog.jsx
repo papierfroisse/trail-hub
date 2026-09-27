@@ -4,7 +4,7 @@ import { ALL_GR_CATALOG } from '../data/allGrCatalog';
 import { CITIES_COORDINATES } from '../data/citiesCoordinates';
 import GpxMap from './GpxMap';
 import ElevationProfile from './ElevationProfile';
-import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download, Activity, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Compass, MapPin, Navigation, Mountain, Calendar, Layers, PlusCircle, Search, Download, ExternalLink, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 
 // ─── Fonctions pures extraites hors du composant ───────────────────
